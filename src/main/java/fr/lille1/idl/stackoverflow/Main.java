@@ -2,10 +2,8 @@ package fr.lille1.idl.stackoverflow;
 
 import fr.lille1.idl.stackoverflow.processors.SQLProcessor;
 import fr.lille1.idl.stackoverflow.processors.XMLEventProcessor;
-import fr.lille1.idl.stackoverflow.processors.XMLWriter;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.events.Attribute;
@@ -20,10 +18,17 @@ import java.util.List;
  * Created by dorian on 19/11/14.
  */
 public class Main {
+    public static final String USAGE = "Usage : java -jar so-extractor-1.0-SNAPSHOT-jar-with-dependencies.jar path/to/Posts.xml";
+
     public static void main(final String[] args) throws Exception {
+        if (args.length != 1) {
+            System.out.println(USAGE);
+            System.exit(0);
+        }
+        String filename = args[0];
         long beginning = System.nanoTime();
         XMLInputFactory factory = XMLInputFactory.newFactory();
-        InputStream is = new FileInputStream("/home/dorian/IDL/StackOverflow/posts-filtered.xml");
+        InputStream is = new FileInputStream(filename);
         XMLEventReader reader = factory.createXMLEventReader(is);
         List<XMLEventProcessor> processors = new ArrayList<XMLEventProcessor>();
         int counter = 0;
@@ -50,9 +55,9 @@ public class Main {
                             }
                         }
                     }
-                }
-                if ((counter % 1000) == 0) {
-                    System.out.println("counter : " + counter);
+                    if ((counter % 1000) == 0) {
+                        System.out.println("posts processed : " + counter);
+                    }
                 }
             }
         } catch (Exception e) {
