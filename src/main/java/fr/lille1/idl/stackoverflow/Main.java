@@ -8,14 +8,11 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,15 +25,14 @@ public class Main {
         XMLInputFactory factory = XMLInputFactory.newFactory();
         InputStream is = new FileInputStream("/home/dorian/IDL/StackOverflow/posts-filtered.xml");
         XMLEventReader reader = factory.createXMLEventReader(is);
-        XMLWriter writer = new XMLWriter("/tmp/posts.xml");
-        XMLEventFactory xef = XMLEventFactory.newFactory();
         List<XMLEventProcessor> processors = new ArrayList<XMLEventProcessor>();
-        //processors.add(writer);
+        int counter = 0;
         processors.add(new SQLProcessor());
         try {
             while (reader.hasNext()) {
                 XMLEvent event = reader.nextEvent();
                 if (event.isStartElement()) {
+                    counter++;
                     StartElement start = event.asStartElement();
                     QName startName = start.getName();
                     if (!startName.toString().trim().equalsIgnoreCase("row")) {
@@ -47,10 +43,16 @@ public class Main {
                     Attribute tags = start.getAttributeByName(new QName("Tags"));
                     if (acceptedAnswer != null && parentId == null && tags.toString().contains("java")) {
                         for (XMLEventProcessor processor : processors) {
-                            processor.process(event);
+                            try {
+                                processor.process(event);
+                            } catch (Exception processingException) {
+                                continue;
+                            }
                         }
                     }
-
+                }
+                if ((counter % 1000) == 0) {
+                    System.out.println("counter : " + counter);
                 }
             }
         } catch (Exception e) {
