@@ -1,5 +1,7 @@
 package fr.lille1.idl.stackoverflow;
 
+import fr.lille1.idl.stackoverflow.processors.SQLProcessor;
+import fr.lille1.idl.stackoverflow.processors.XMLEventProcessor;
 import fr.lille1.idl.stackoverflow.processors.XMLWriter;
 
 import javax.xml.namespace.QName;
@@ -13,18 +15,24 @@ import javax.xml.stream.events.XMLEvent;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by dorian on 19/11/14.
  */
 public class Main {
-    public static void main(final String[] args) throws XMLStreamException, IOException {
+    public static void main(final String[] args) throws Exception {
         long beginning = System.nanoTime();
         XMLInputFactory factory = XMLInputFactory.newFactory();
         InputStream is = new FileInputStream("/home/dorian/IDL/StackOverflow/posts-filtered.xml");
         XMLEventReader reader = factory.createXMLEventReader(is);
         XMLWriter writer = new XMLWriter("/tmp/posts.xml");
         XMLEventFactory xef = XMLEventFactory.newFactory();
+        List<XMLEventProcessor> processors = new ArrayList<XMLEventProcessor>();
+        //processors.add(writer);
+        processors.add(new SQLProcessor());
         try {
             while (reader.hasNext()) {
                 XMLEvent event = reader.nextEvent();
@@ -38,7 +46,9 @@ public class Main {
                     Attribute parentId = start.getAttributeByName(new QName("parentId"));
                     Attribute tags = start.getAttributeByName(new QName("Tags"));
                     if (acceptedAnswer != null && parentId == null && tags.toString().contains("java")) {
-                        writer.process(event);
+                        for (XMLEventProcessor processor : processors) {
+                            processor.process(event);
+                        }
                     }
 
                 }
@@ -50,7 +60,10 @@ public class Main {
                 reader.close();
             }
             is.close();
-            writer.close();
+            for (XMLEventProcessor processor : processors) {
+                processor.close();
+            }
+
         }
         long ending = System.nanoTime();
         System.out.println("Time spent : " + (ending - beginning) + " ns");
