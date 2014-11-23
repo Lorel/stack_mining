@@ -1,5 +1,8 @@
 package fr.lille1.idl.stackoverflow;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import javax.xml.namespace.QName;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.StartElement;
@@ -39,7 +42,7 @@ public class Post implements Serializable {
         Attribute titleAttribute = start.getAttributeByName(new QName("Title"));
         this.title = titleAttribute.getValue();
         Attribute bodyAttribute = start.getAttributeByName(new QName("Body"));
-        this.body = bodyAttribute.getValue();
+        this.body = StringEscapeUtils.unescapeXml(bodyAttribute.getValue());
         Attribute acceptedAnswerAttribute = start.getAttributeByName(new QName("AcceptedAnswerId"));
         int acceptedAnswer;
         try {
