@@ -27,6 +27,10 @@ public class Main {
         }
         String filename = args[0];
         long beginning = System.nanoTime();
+        FileInputStream fis = new FileInputStream("config.properties");
+        Configuration configuration = Configuration.getConfiguration();
+        configuration.load(fis);
+        fis.close();
         XMLInputFactory factory = XMLInputFactory.newFactory();
         InputStream is = new FileInputStream(filename);
         XMLEventReader reader = factory.createXMLEventReader(is);

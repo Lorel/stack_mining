@@ -16,7 +16,6 @@ public class PostDatabase {
         INSERT
     }
 
-    public static final int BUFFER_SIZE = 1000;
 
     private Connection connection;
     private Map<OPERATIONS, PreparedStatement> statements = null;
@@ -37,22 +36,10 @@ public class PostDatabase {
         statement.setString(3, post.getBody());
         statement.setInt(4, post.getAcceptedAnswer());
         statement.setTimestamp(5, post.getCreationDate());
-        statement.addBatch();
-        ++counter;
-        if (counter == BUFFER_SIZE) {
-            this.flush();
-            counter = 0;
-        }
-    }
-
-    public void flush() throws SQLException {
-        PreparedStatement statement = this.statements.get(OPERATIONS.INSERT);
-        statement.executeBatch();
-        statement.clearParameters();
+        statement.executeUpdate();
     }
 
     public void close() throws SQLException {
-        this.flush();
         for (PreparedStatement ps : this.statements.values()) {
             ps.close();
         }

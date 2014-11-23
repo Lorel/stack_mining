@@ -1,5 +1,6 @@
 package fr.lille1.idl.stackoverflow.processors;
 
+import fr.lille1.idl.stackoverflow.Configuration;
 import fr.lille1.idl.stackoverflow.Post;
 import fr.lille1.idl.stackoverflow.persistence.PostDatabase;
 
@@ -15,7 +16,15 @@ public class SQLProcessor implements XMLEventProcessor {
     private PostDatabase database;
 
     public SQLProcessor() throws SQLException, ClassNotFoundException {
-        Connection connection = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/stackoverflow?user=root&password=toor");
+        Class.forName("com.mysql.jdbc.Driver");
+        Configuration configuration = Configuration.getConfiguration();
+        String host = configuration.getProperty("db.host", "127.0.0.1");
+        int port = Integer.parseInt(configuration.getProperty("db.port", "3306"));
+        String database = configuration.getProperty("db.database", "stackoverflow");
+        String user = configuration.getProperty("db.user", "stackoverflow");
+        String password = configuration.getProperty("db.password", "stackoverflow");
+        Connection connection = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database +
+                "?user=" + user + "&password=" + password);
         this.database = new PostDatabase(connection);
     }
 
