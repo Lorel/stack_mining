@@ -8,13 +8,21 @@ import fr.lille1.idl.stackoverflow.processors.XMLEventProcessor;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 /**
  * Created by dorian on 19/11/14.
@@ -27,22 +35,63 @@ public class Main {
             System.out.println(USAGE);
             System.exit(0);
         }
+        Logger logger = Logger.getGlobal();
+        SimpleFormatter formatter = new SimpleFormatter();
+        FileHandler fh = new FileHandler("out.log", true);
+        fh.setFormatter(formatter);
+        logger.addHandler(fh);
         String filename = args[0];
         long beginning = System.nanoTime();
-        FileInputStream fis = new FileInputStream("config.properties");
-        Configuration configuration = Configuration.getConfiguration();
-        configuration.load(fis);
-        fis.close();
+        FileInputStream configFileInputStream = null;
+        try {
+            configFileInputStream = new FileInputStream("config.properties");
+            Configuration configuration = Configuration.getConfiguration();
+            configuration.load(configFileInputStream);
+            configFileInputStream.close();
+        } catch (FileNotFoundException e) {
+            logger.log(Level.SEVERE, "Could not find config file config.properties", e);
+            System.exit(1);
+        } catch (IOException e) {
+            logger.log(Level.SEVERE, e.getMessage(), e);
+            System.exit(2);
+        } finally {
+            if (configFileInputStream != null) {
+                configFileInputStream.close();
+            }
+        }
         XMLInputFactory factory = XMLInputFactory.newFactory();
-        InputStream is = new FileInputStream(filename);
-        XMLEventReader reader = factory.createXMLEventReader(is);
+        InputStream xmlInputStream = null;
+        try {
+            xmlInputStream = new FileInputStream(filename);
+        } catch (FileNotFoundException e) {
+            if (xmlInputStream != null) {
+                xmlInputStream.close();
+            }
+            logger.log(Level.SEVERE, "Could not find input XML file", e);
+            System.exit(3);
+        }
+        XMLEventReader reader = null;
+        try {
+            reader = factory.createXMLEventReader(xmlInputStream);
+        } catch (XMLStreamException e) {
+            logger.log(Level.SEVERE, e.getMessage(), e);
+            System.exit(4);
+        }
         List<XMLEventProcessor> processors = new ArrayList<XMLEventProcessor>();
         int nodesCounter = 0, postsCounter = 0, interestingPostsCounter = 0;
-        processors.add(new SQLProcessor());
+        try {
+            processors.add(new SQLProcessor());
+        } catch (ClassNotFoundException e) {
+            logger.log(Level.SEVERE, "Could not load JDBC driver", e);
+            System.exit(5);
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Could not initialize SQL prepared statement", e);
+            System.exit(6);
+        }
         try {
             while (reader.hasNext()) {
                 if ((nodesCounter % 1000) == 0) {
-                    System.out.println("nodes processed : " + nodesCounter + ", posts processed : " + postsCounter + ", posts with stack traces : " + interestingPostsCounter);
+                    logger.log(Level.INFO, "nodes processed : " + nodesCounter + ", posts processed : " + postsCounter + ", posts with stack traces : " + interestingPostsCounter);
                 }
                 XMLEvent event = reader.nextEvent();
                 nodesCounter++;
@@ -58,28 +107,36 @@ public class Main {
                     Attribute tags = start.getAttributeByName(new QName("Tags"));
                     if (acceptedAnswer != null && parentId == null && tags.toString().contains("java")) {
                         Post post = new Post(event);
-                        List<StackTrace> traces = StackTraceParser.parseAll(post.getBody());
+                        List<StackTrace> traces = null;
+                        try {
+                            traces = StackTraceParser.parseAll(post.getBody());
+                        } catch (Exception e) {
+                            logger.log(Level.SEVERE, "Crashed on post " + post.getId(), e);
+                            logger.log(Level.INFO, event.toString());
+                            throw e;
+                        }
                         if (traces.isEmpty()) {
                             continue;
                         }
                         interestingPostsCounter++;
                         for (XMLEventProcessor processor : processors) {
                             try {
+                                logger.log(Level.INFO, "processing post " + post.getId());
                                 processor.process(event);
                             } catch (Exception processingException) {
-                                continue;
+                                logger.log(Level.WARNING, "error proceessing post " + post.getId() + " : " + processingException.getMessage(), processingException);
                             }
                         }
                     }
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, e.getMessage(), e);
         } finally {
             if (reader != null) {
                 reader.close();
             }
-            is.close();
+            xmlInputStream.close();
             for (XMLEventProcessor processor : processors) {
                 processor.close();
             }
