@@ -104,8 +104,9 @@ public class Main {
                     }
                     Attribute acceptedAnswer = start.getAttributeByName(new QName("AcceptedAnswerId"));
                     Attribute parentId = start.getAttributeByName(new QName("parentId"));
-                    Attribute tags = start.getAttributeByName(new QName("Tags"));
-                    if (acceptedAnswer != null && parentId == null && tags.toString().contains("java")) {
+                    Attribute tagsAttribute = start.getAttributeByName(new QName("Tags"));
+                    String tags = tagsAttribute.toString().toLowerCase();
+                    if (acceptedAnswer != null && parentId == null && tags.contains("java") && !tags.contains("javascript")) {
                         Post post = new Post(event);
                         List<StackTrace> traces = null;
                         try {
