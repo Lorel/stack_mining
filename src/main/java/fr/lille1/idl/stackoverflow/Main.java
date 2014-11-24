@@ -111,10 +111,10 @@ public class Main {
                         List<StackTrace> traces = null;
                         try {
                             traces = StackTraceParser.parseAll(post.getBody());
-                        } catch (Exception e) {
+                        } catch (StackOverflowError e) {
                             logger.log(Level.SEVERE, "Crashed on post " + post.getId(), e);
                             logger.log(Level.INFO, event.toString());
-                            throw e;
+                            continue;
                         }
                         if (traces.isEmpty()) {
                             continue;
