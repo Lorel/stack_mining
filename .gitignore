@@ -6,3 +6,7 @@
 *.jar
 *.log
 *.out
+/target
+.classpath
+.project
+.settings/
