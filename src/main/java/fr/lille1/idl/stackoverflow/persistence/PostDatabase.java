@@ -26,13 +26,13 @@ public class PostDatabase {
     public PostDatabase(Connection connection) throws SQLException {
         this.connection = connection;
         this.statements = new HashMap<OPERATIONS, PreparedStatement>();
-        String insertStatement = "INSERT INTO Post(id, title, body, accepted_answer, creation_date) VALUES(?, ?, ?, ?, ?)";
+        String insertStatement = "INSERT INTO post(id, title, body, accepted_answer, creation_date) VALUES(?, ?, ?, ?, ?)";
         PreparedStatement insertPreparedStatement = this.connection.prepareStatement(insertStatement);
         this.statements.put(OPERATIONS.INSERT, insertPreparedStatement);
-        String findStatement = "SELECT * FROM Post WHERE id = ?";
+        String findStatement = "SELECT * FROM post WHERE id = ?";
         PreparedStatement findPreparedStatement = this.connection.prepareStatement(findStatement);
         this.statements.put(OPERATIONS.FIND_BY_ID, findPreparedStatement);
-        String listIdsStatement = "SELECT id FROM Post";
+        String listIdsStatement = "SELECT id FROM post";
         PreparedStatement listIdsPreparedStatement = this.connection.prepareStatement(listIdsStatement);
         this.statements.put(OPERATIONS.LIST_IDS, listIdsPreparedStatement);
     }
