@@ -1,4 +1,3 @@
-CREATE USER IF NOT EXISTS 'stackoverflow'@'%' IDENTIFIED BY 'stackoverflow';
 CREATE DATABASE IF NOT EXISTS stackoverflow;
 
 CREATE TABLE IF NOT EXISTS stackoverflow.post (
@@ -48,4 +47,4 @@ CREATE TABLE IF NOT EXISTS stackoverflow.stack_link (
 	link	_id			INTEGER			NOT NULL
 );
 
-GRANT ALL ON stackoverflow.* TO 'stackoverflow'@'%' WITH GRANT OPTION;
+GRANT ALL ON stackoverflow.* TO 'stackoverflow'@'%' IDENTIFIED BY 'stackoverflow' WITH GRANT OPTION;
