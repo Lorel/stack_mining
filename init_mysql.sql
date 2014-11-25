@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS stackoverflow.link (
 CREATE TABLE IF NOT EXISTS stackoverflow.stack_link (
 	id					INTEGER			PRIMARY KEY,
 	stack_id			INTEGER			NOT NULL,
-	link	_id			INTEGER			NOT NULL
+	link_id				INTEGER			NOT NULL
 );
 
 GRANT ALL ON stackoverflow.* TO 'stackoverflow'@'%' IDENTIFIED BY 'stackoverflow' WITH GRANT OPTION;
