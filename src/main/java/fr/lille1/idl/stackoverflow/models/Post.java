@@ -1,13 +1,16 @@
-package fr.lille1.idl.stackoverflow;
+package fr.lille1.idl.stackoverflow.models;
 
 import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.commons.lang3.StringUtils;
+
+import fr.lille1.idl.stackoverflow.persistence.PostDatabase;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+
 import java.io.Serializable;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -19,13 +22,17 @@ import java.util.Date;
  */
 public class Post implements Serializable {
 
-    private int id;
+	private static final long serialVersionUID = -9076424213715351234L;
+
+	private int id;
 
     private String title;
 
     private String body;
 
-    private int acceptedAnswer;
+    private Post acceptedAnswer;
+    
+    private Integer acceptedAnswerId;
 
     private Timestamp creationDate;
 
@@ -44,13 +51,13 @@ public class Post implements Serializable {
         Attribute bodyAttribute = start.getAttributeByName(new QName("Body"));
         this.body = StringEscapeUtils.unescapeXml(bodyAttribute.getValue());
         Attribute acceptedAnswerAttribute = start.getAttributeByName(new QName("AcceptedAnswerId"));
-        int acceptedAnswer;
+        Integer acceptedAnswer;
         try {
             acceptedAnswer = Integer.parseInt(acceptedAnswerAttribute.getValue());
         } catch (NumberFormatException e) {
             acceptedAnswer = -1;
         }
-        this.acceptedAnswer = acceptedAnswer;
+        this.acceptedAnswerId = acceptedAnswer;
         Attribute creationDateAttribute = start.getAttributeByName(new QName("CreationDate"));
         DateFormat format = new SimpleDateFormat("yyyy-mm-dd'T'HH:mm:ss.S");
         Timestamp creationDate;
@@ -99,11 +106,23 @@ public class Post implements Serializable {
         this.body = body;
     }
 
-    public int getAcceptedAnswer() {
+    public Post getAcceptedAnswer() throws ClassNotFoundException, SQLException {    	
+    	if (this.acceptedAnswer == null && this.acceptedAnswerId != null)
+    		this.acceptedAnswer = PostDatabase.getInstance().find(this.acceptedAnswerId.intValue());
         return acceptedAnswer;
     }
 
-    public void setAcceptedAnswer(int acceptedAnswer) {
+    public void setAcceptedAnswer(Post acceptedAnswer) {
         this.acceptedAnswer = acceptedAnswer;
     }
+
+	public Integer getAcceptedAnswerId() {
+		if (this.acceptedAnswer != null && this.acceptedAnswerId == null)
+			this.acceptedAnswerId = this.acceptedAnswer.getId();
+		return acceptedAnswerId;
+	}
+
+	public void setAcceptedAnswerId(Integer acceptedAnswerId) {
+		this.acceptedAnswerId = acceptedAnswerId;
+	}
 }

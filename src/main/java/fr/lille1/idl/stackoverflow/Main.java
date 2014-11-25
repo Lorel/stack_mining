@@ -2,6 +2,7 @@ package fr.lille1.idl.stackoverflow;
 
 import de.tud.stacktraces.evaluation.datastruct.StackTrace;
 import de.tud.stacktraces.evaluation.datastruct.StackTraceParser;
+import fr.lille1.idl.stackoverflow.models.Post;
 import fr.lille1.idl.stackoverflow.processors.SQLProcessor;
 import fr.lille1.idl.stackoverflow.processors.XMLEventProcessor;
 
@@ -12,6 +13,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;

@@ -1,10 +1,11 @@
 package fr.lille1.idl.stackoverflow.processors;
 
 import fr.lille1.idl.stackoverflow.Configuration;
-import fr.lille1.idl.stackoverflow.Post;
+import fr.lille1.idl.stackoverflow.models.Post;
 import fr.lille1.idl.stackoverflow.persistence.PostDatabase;
 
 import javax.xml.stream.events.XMLEvent;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -15,8 +16,12 @@ import java.sql.SQLException;
 public class SQLProcessor implements XMLEventProcessor {
     private PostDatabase database;
 
-    public SQLProcessor() throws SQLException, ClassNotFoundException {
-        Class.forName("com.mysql.jdbc.Driver");
+    public SQLProcessor() throws SQLException, ClassNotFoundException {    
+        this.database = new PostDatabase(getConnection());
+    }
+
+    public static Connection getConnection() throws ClassNotFoundException, SQLException {
+    	Class.forName("com.mysql.jdbc.Driver");
         Configuration configuration = Configuration.getConfiguration();
         String host = configuration.getProperty("db.host", "127.0.0.1");
         int port = Integer.parseInt(configuration.getProperty("db.port", "3306"));
@@ -25,10 +30,10 @@ public class SQLProcessor implements XMLEventProcessor {
         String password = configuration.getProperty("db.password", "stackoverflow");
         Connection connection = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database +
                 "?user=" + user + "&password=" + password);
-        this.database = new PostDatabase(connection);
-    }
+		return connection;
+	}
 
-    @Override
+	@Override
     public void process(final XMLEvent event) throws Exception {
         Post post = new Post(event);
         database.insert(post);

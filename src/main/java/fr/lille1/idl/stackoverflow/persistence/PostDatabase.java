@@ -1,6 +1,7 @@
 package fr.lille1.idl.stackoverflow.persistence;
 
-import fr.lille1.idl.stackoverflow.Post;
+import fr.lille1.idl.stackoverflow.models.Post;
+import fr.lille1.idl.stackoverflow.processors.SQLProcessor;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -18,7 +19,12 @@ public class PostDatabase {
         FIND_BY_ID,
         LIST_IDS
     }
-
+    
+    private static String ID = "id";
+    private static String TITLE = "title";
+    private static String BODY = "body";
+    private static String ACCEPTED_ANSWER = "accepted_answer_id";
+    private static String DATE = "creation_date";
 
     private Connection connection;
     private Map<OPERATIONS, PreparedStatement> statements = null;
@@ -26,13 +32,13 @@ public class PostDatabase {
     public PostDatabase(Connection connection) throws SQLException {
         this.connection = connection;
         this.statements = new HashMap<OPERATIONS, PreparedStatement>();
-        String insertStatement = "INSERT INTO post(id, title, body, accepted_answer, creation_date) VALUES(?, ?, ?, ?, ?)";
+        String insertStatement = "INSERT INTO post(" + ID + ", " + TITLE + ", " + BODY + ", " + ACCEPTED_ANSWER + ", " + DATE + ") VALUES(?, ?, ?, ?, ?)";
         PreparedStatement insertPreparedStatement = this.connection.prepareStatement(insertStatement);
         this.statements.put(OPERATIONS.INSERT, insertPreparedStatement);
-        String findStatement = "SELECT * FROM post WHERE id = ?";
+        String findStatement = "SELECT * FROM post WHERE " + ID + " = ?";
         PreparedStatement findPreparedStatement = this.connection.prepareStatement(findStatement);
         this.statements.put(OPERATIONS.FIND_BY_ID, findPreparedStatement);
-        String listIdsStatement = "SELECT id FROM post";
+        String listIdsStatement = "SELECT " + ID + " FROM post";
         PreparedStatement listIdsPreparedStatement = this.connection.prepareStatement(listIdsStatement);
         this.statements.put(OPERATIONS.LIST_IDS, listIdsPreparedStatement);
     }
@@ -48,7 +54,7 @@ public class PostDatabase {
         statement.setInt(1, post.getId());
         statement.setString(2, post.getTitle());
         statement.setString(3, post.getBody());
-        statement.setInt(4, post.getAcceptedAnswer());
+        statement.setInt(4, post.getAcceptedAnswerId());
         statement.setTimestamp(5, post.getCreationDate());
         statement.executeUpdate();
     }
@@ -69,16 +75,16 @@ public class PostDatabase {
             resultSet.close();
             return null;
         }
-        int acceptedAnswer = resultSet.getInt("accepted_answer");
-        String title = resultSet.getString("title");
-        String body = resultSet.getString("body");
-        Timestamp creationDate = resultSet.getTimestamp("creation_date");
+        int acceptedAnswer = resultSet.getInt(ACCEPTED_ANSWER);
+        String title = resultSet.getString(TITLE);
+        String body = resultSet.getString(BODY);
+        Timestamp creationDate = resultSet.getTimestamp(DATE);
         resultSet.close();
         Post post = new Post();
         post.setId(id);
         post.setTitle(title);
         post.setBody(body);
-        post.setAcceptedAnswer(acceptedAnswer);
+        post.setAcceptedAnswerId(Integer.valueOf(acceptedAnswer));
         post.setCreationDate(creationDate);
         return post;
     }
@@ -94,7 +100,7 @@ public class PostDatabase {
         final ResultSet resultSet = statement.executeQuery();
         List<Integer> ids = new ArrayList<Integer>();
         while (resultSet.next()) {
-            ids.add(resultSet.getInt("id"));
+            ids.add(resultSet.getInt(ID));
         }
         resultSet.close();
         return ids;
@@ -111,4 +117,8 @@ public class PostDatabase {
         }
         this.connection.close();
     }
+
+	public static PostDatabase getInstance() throws ClassNotFoundException, SQLException {
+		return new PostDatabase(SQLProcessor.getConnection());
+	}
 }
