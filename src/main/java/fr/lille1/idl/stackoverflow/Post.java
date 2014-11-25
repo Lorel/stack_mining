@@ -63,6 +63,10 @@ public class Post implements Serializable {
         this.creationDate = creationDate;
     }
 
+    public Post() {
+
+    }
+
     public Timestamp getCreationDate() {
         return creationDate;
     }
