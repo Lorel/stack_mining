@@ -1,7 +1,7 @@
 package fr.lille1.idl.stackoverflow.persistence;
 
-import fr.lille1.idl.stackoverflow.models.Post;
 import fr.lille1.idl.stackoverflow.processors.SQLProcessor;
+import fr.lille1.idl.stackoverflow.tables.Post;
 
 import java.sql.*;
 import java.util.ArrayList;

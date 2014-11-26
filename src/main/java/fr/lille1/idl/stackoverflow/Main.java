@@ -2,9 +2,9 @@ package fr.lille1.idl.stackoverflow;
 
 import de.tud.stacktraces.evaluation.datastruct.StackTrace;
 import de.tud.stacktraces.evaluation.datastruct.StackTraceParser;
-import fr.lille1.idl.stackoverflow.models.Post;
 import fr.lille1.idl.stackoverflow.processors.SQLProcessor;
 import fr.lille1.idl.stackoverflow.processors.XMLEventProcessor;
+import fr.lille1.idl.stackoverflow.tables.Post;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;

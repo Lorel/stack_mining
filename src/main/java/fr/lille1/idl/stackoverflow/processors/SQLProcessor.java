@@ -1,8 +1,8 @@
 package fr.lille1.idl.stackoverflow.processors;
 
 import fr.lille1.idl.stackoverflow.Configuration;
-import fr.lille1.idl.stackoverflow.models.Post;
 import fr.lille1.idl.stackoverflow.persistence.PostDatabase;
+import fr.lille1.idl.stackoverflow.tables.Post;
 
 import javax.xml.stream.events.XMLEvent;
 

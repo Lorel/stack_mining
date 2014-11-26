@@ -1,4 +1,4 @@
-package fr.lille1.idl.stackoverflow.models;
+package fr.lille1.idl.stackoverflow.tables;
 
 import java.io.Serializable;
 
@@ -12,14 +12,14 @@ public class Frame implements Serializable {
 	
 	private String file_name;
 	
-	private int position;
+	private int lineNumber;
 
-	public Frame(int id, String method_name, String file_name, int position) {
+	public Frame(int id, String method_name, String file_name, int lineNumber) {
 		super();
 		this.setId(id);
 		this.setMethod_name(method_name);
 		this.setFile_name(file_name);
-		this.setPosition(position);
+		this.setLineNumber(lineNumber);
 	}
 
 	public int getId() {
@@ -46,12 +46,12 @@ public class Frame implements Serializable {
 		this.file_name = file_name;
 	}
 
-	public int getPosition() {
-		return position;
+	public int getLineNumber() {
+		return lineNumber;
 	}
 
-	public void setPosition(int position) {
-		this.position = position;
+	public void setLineNumber(int lineNumber) {
+		this.lineNumber = lineNumber;
 	}
 	
 	
