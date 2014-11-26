@@ -35,10 +35,10 @@ CREATE TABLE IF NOT EXISTS stackoverflow.frame (
 );
 
 CREATE TABLE IF NOT EXISTS stackoverflow.link (
-	id					INTEGER			PRIMARY KEY,
+	id					INTEGER AUTO_INCREMENT PRIMARY KEY,
 	parent_frame_id		INTEGER			NOT NULL,
 	child_frame_id		INTEGER			NOT NULL,
-	next_id				INTEGER			NOT NULL
+	next_id				INTEGER			NULL
 );
 
 CREATE TABLE IF NOT EXISTS stackoverflow.stack_link (

@@ -1,6 +1,7 @@
 package fr.lille1.idl.stackoverflow.persistence;
 
 import fr.lille1.idl.stackoverflow.models.Frame;
+import fr.lille1.idl.stackoverflow.models.Link;
 import fr.lille1.idl.stackoverflow.models.Post;
 import fr.lille1.idl.stackoverflow.processors.SQLProcessor;
 
@@ -19,7 +20,8 @@ public class PostDatabase {
         INSERT,
         FIND_BY_ID,
         LIST_IDS,
-        INSERT_FRAME;
+        INSERT_FRAME,
+        INSERT_LINK;
     }
 
     private static String ID = "id";
@@ -44,8 +46,11 @@ public class PostDatabase {
         PreparedStatement listIdsPreparedStatement = this.connection.prepareStatement(listIdsStatement);
         this.statements.put(OPERATIONS.LIST_IDS, listIdsPreparedStatement);
         String insertFrameStatement = "INSERT INTO frame(file_name, method_name, line_number) VALUES(?, ?, ?);";
-        PreparedStatement insertFrame = connection.prepareStatement(insertFrameStatement);
+        PreparedStatement insertFrame = connection.prepareStatement(insertFrameStatement, Statement.RETURN_GENERATED_KEYS);
         this.statements.put(OPERATIONS.INSERT_FRAME, insertFrame);
+        String insertLinkStatement = "INSERT INTO link(parent_frame_id, child_frame_id, next_id) VALUES(?, ?, ?);";
+        PreparedStatement insertLink = connection.prepareStatement(insertLinkStatement, Statement.RETURN_GENERATED_KEYS);
+        this.statements.put(OPERATIONS.INSERT_LINK, insertLink);
     }
 
     /**
@@ -132,19 +137,30 @@ public class PostDatabase {
         statement.setString(1, frame.getFileName());
         statement.setString(2, frame.getMethodName());
         statement.setInt(3, frame.getLineNumber());
-        /*ResultSet resultSet = */
-        statement.execute();
-        /*
-        resultSet.next();
-        int id= resultSet.getInt("id");
-        String filename = resultSet.getString("filemane");
-        String methodName = resultSet.getString("method");
-        statement.close();
-        int lineNumber = resultSet.getInt("line_number");
-        frame = new Frame(id, filename, methodName, lineNumber);
-        */
+        statement.executeUpdate();
+        ResultSet resultset = statement.getGeneratedKeys();
+        resultset.next();
+        int id = resultset.getInt(1);
         statement.clearParameters();
-        statement.close();
-        return null;
+        frame.setId(id);
+        return frame;
+    }
+
+    public Link insert(Link link) throws SQLException {
+        PreparedStatement statement = statements.get(OPERATIONS.INSERT_LINK);
+        statement.setInt(1, link.getParent_frame().getId());
+        statement.setInt(2, link.getChild_frame().getId());
+        if (link.getNext() != null) {
+            statement.setInt(3, link.getNext().getId());
+        } else {
+            statement.setNull(3, Types.INTEGER);
+        }
+        statement.executeUpdate();
+        ResultSet resultSet = statement.getGeneratedKeys();
+        resultSet.next();
+        int id = resultSet.getInt(1);
+        link.setId(id);
+        statement.clearParameters();
+        return link;
     }
 }
