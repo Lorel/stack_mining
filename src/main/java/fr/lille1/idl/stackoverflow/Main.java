@@ -13,7 +13,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -127,7 +126,7 @@ public class Main {
                                 logger.log(Level.INFO, "processing post " + post.getId());
                                 processor.process(event);
                             } catch (Exception processingException) {
-                                logger.log(Level.WARNING, "error proceessing post " + post.getId() + " : " + processingException.getMessage(), processingException);
+                                logger.log(Level.WARNING, "error processing post " + post.getId() + " : " + processingException.getMessage(), processingException);
                             }
                         }
                     }
