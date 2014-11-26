@@ -1,0 +1,17 @@
+.idea
+*~
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.class
+*.iml
+*.jar
+*.log
+*.out
+*.run.xml
+*.toc
+/target
+.classpath
+.project
+.settings/
