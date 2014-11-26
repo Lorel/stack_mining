@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS stackoverflow.post_stack (
 );
 
 CREATE TABLE IF NOT EXISTS stackoverflow.frame (
-	id					INTEGER			PRIMARY KEY,
+	id					INTEGER AUTO_INCREMENT PRIMARY KEY,
 	method_name			VARCHAR(256)	NOT NULL,
 	file_name			VARCHAR(256)	NOT NULL,
 	line_number			INTEGER			NOT NULL

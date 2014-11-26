@@ -1,5 +1,6 @@
 package fr.lille1.idl.stackoverflow.persistence;
 
+import fr.lille1.idl.stackoverflow.models.Frame;
 import fr.lille1.idl.stackoverflow.models.Post;
 import fr.lille1.idl.stackoverflow.processors.SQLProcessor;
 
@@ -17,9 +18,10 @@ public class PostDatabase {
     public static enum OPERATIONS {
         INSERT,
         FIND_BY_ID,
-        LIST_IDS
+        LIST_IDS,
+        INSERT_FRAME;
     }
-    
+
     private static String ID = "id";
     private static String TITLE = "title";
     private static String BODY = "body";
@@ -41,6 +43,9 @@ public class PostDatabase {
         String listIdsStatement = "SELECT " + ID + " FROM post";
         PreparedStatement listIdsPreparedStatement = this.connection.prepareStatement(listIdsStatement);
         this.statements.put(OPERATIONS.LIST_IDS, listIdsPreparedStatement);
+        String insertFrameStatement = "INSERT INTO frame(file_name, method_name, line_number) VALUES(?, ?, ?);";
+        PreparedStatement insertFrame = connection.prepareStatement(insertFrameStatement);
+        this.statements.put(OPERATIONS.INSERT_FRAME, insertFrame);
     }
 
     /**
@@ -118,7 +123,28 @@ public class PostDatabase {
         this.connection.close();
     }
 
-	public static PostDatabase getInstance() throws ClassNotFoundException, SQLException {
-		return new PostDatabase(SQLProcessor.getConnection());
-	}
+    public static PostDatabase getInstance() throws ClassNotFoundException, SQLException {
+        return new PostDatabase(SQLProcessor.getConnection());
+    }
+
+    public Frame insert(Frame frame) throws SQLException {
+        PreparedStatement statement = statements.get(OPERATIONS.INSERT_FRAME);
+        statement.setString(1, frame.getFileName());
+        statement.setString(2, frame.getMethodName());
+        statement.setInt(3, frame.getLineNumber());
+        /*ResultSet resultSet = */
+        statement.execute();
+        /*
+        resultSet.next();
+        int id= resultSet.getInt("id");
+        String filename = resultSet.getString("filemane");
+        String methodName = resultSet.getString("method");
+        statement.close();
+        int lineNumber = resultSet.getInt("line_number");
+        frame = new Frame(id, filename, methodName, lineNumber);
+        */
+        statement.clearParameters();
+        statement.close();
+        return null;
+    }
 }

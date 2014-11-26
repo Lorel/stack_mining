@@ -8,18 +8,18 @@ public class Frame implements Serializable {
 
 	private int id;
 	
-	private String method_name;
+	private String methodName;
 	
-	private String file_name;
+	private String fileName;
 	
-	private int position;
+	private int lineNumber;
 
-	public Frame(int id, String method_name, String file_name, int position) {
+	public Frame(int id, String fileName, String methodName, int lineNumber) {
 		super();
 		this.setId(id);
-		this.setMethod_name(method_name);
-		this.setFile_name(file_name);
-		this.setPosition(position);
+		this.setMethodName(methodName);
+		this.setFileName(fileName);
+		this.setLineNumber(lineNumber);
 	}
 
 	public int getId() {
@@ -30,28 +30,28 @@ public class Frame implements Serializable {
 		this.id = id;
 	}
 
-	public String getMethod_name() {
-		return method_name;
+	public String getMethodName() {
+		return methodName;
 	}
 
-	public void setMethod_name(String method_name) {
-		this.method_name = method_name;
+	public void setMethodName(String methodName) {
+		this.methodName = methodName;
 	}
 
-	public String getFile_name() {
-		return file_name;
+	public String getFileName() {
+		return fileName;
 	}
 
-	public void setFile_name(String file_name) {
-		this.file_name = file_name;
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
 	}
 
-	public int getPosition() {
-		return position;
+	public int getLineNumber() {
+		return lineNumber;
 	}
 
-	public void setPosition(int position) {
-		this.position = position;
+	public void setLineNumber(int lineNumber) {
+		this.lineNumber = lineNumber;
 	}
 	
 	
