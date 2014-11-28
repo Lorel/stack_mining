@@ -16,7 +16,8 @@ public class JavaStackTrace extends StackTrace implements StackTraceItf {
 	
 	public JavaStackTrace(StackTrace stackTrace) {
 		this.stackTrace = stackTrace;
-		this.setNext(new JavaStackTrace(stackTrace.getCausedBy()));
+		if (stackTrace.getCausedBy() != null)
+			this.setNext(new JavaStackTrace(stackTrace.getCausedBy()));
 	}
 
 	@Override
