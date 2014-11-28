@@ -3,12 +3,18 @@ package fr.lille1.idl.stackoverflow.parsers.java;
 import de.tud.stacktraces.evaluation.datastruct.StackTraceElement;
 import fr.lille1.idl.stackoverflow.parsers.StackTraceElementItf;
 
-public class JavaStackTraceElement extends StackTraceElement implements
+public class JavaStackTraceElement implements
 		StackTraceElementItf {
+	
+	private StackTraceElement stackTraceElement;
+	
+	public JavaStackTraceElement(StackTraceElement stackTraceElement) {
+		this.stackTraceElement = stackTraceElement;
+	}
 	
 	@Override
 	public String getMethod() {
-		return super.getMethod();
+		return this.stackTraceElement.getMethod();
 	}
 
 	@Override

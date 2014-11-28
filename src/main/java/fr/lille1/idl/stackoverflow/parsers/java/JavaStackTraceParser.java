@@ -14,8 +14,8 @@ public class JavaStackTraceParser implements StackTrackParserItf {
 
 	public List<StackTraceItf> parseText(String text) {
 		List<StackTraceItf> returnList = new ArrayList<StackTraceItf>();
-		for (StackTrace javaStackTrace : StackTraceParser.parseAll(text)) {
-			returnList.add((StackTraceItf) javaStackTrace);
+		for (StackTrace stackTrace : StackTraceParser.parseAll(text)) {
+			returnList.add((StackTraceItf) new JavaStackTrace(stackTrace));
 		}
 		return returnList;
 	}

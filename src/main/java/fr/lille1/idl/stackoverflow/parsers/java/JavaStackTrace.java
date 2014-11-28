@@ -7,6 +7,12 @@ import fr.lille1.idl.stackoverflow.parsers.StackTraceElementItf;
 import fr.lille1.idl.stackoverflow.parsers.StackTraceItf;
 
 public class JavaStackTrace extends StackTrace implements StackTraceItf {
+	
+	private StackTrace stackTrace;
+	
+	public JavaStackTrace(StackTrace stackTrace) {
+		this.stackTrace = stackTrace;
+	}
 
 	@Override
 	public List<StackTraceElementItf> getStackTraceElements() {
