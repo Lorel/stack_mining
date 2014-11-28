@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Created by dorian on 22/11/14.
@@ -222,9 +224,16 @@ public class PostDatabase {
         for (int i = elements.size() - 1; i >= 0; i--) {
             StackTraceElement element = elements.get(i);
             String[] tokens = element.getSource().split(":");
-            String fileName = tokens[0];
+            String fileName = tokens[0].trim();
             String methodName = element.getMethod();
-            int lineNumber = Integer.parseInt(tokens[1]);
+            int lineNumber = -1;
+            if (tokens.length == 2) {
+                try {
+                    lineNumber = Integer.parseInt(tokens[1].trim().replaceAll(" ", ""));
+                } catch (NumberFormatException e) {
+                    Logger.getGlobal().log(Level.WARNING, e.getMessage(), e);
+                }
+            }
             Frame child = new Frame(0, fileName, methodName, lineNumber);
             child = this.insert(child);
             if (parent != null) {
