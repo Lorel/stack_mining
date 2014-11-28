@@ -1,9 +1,6 @@
 .idea
 *~
 *.aux
-*.bbl
-*.bcf
-*.blg
 *.class
 *.iml
 *.jar
