@@ -19,14 +19,12 @@ public class JavaStackTraceElement implements
 
 	@Override
 	public String getFileName() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.stackTraceElement.getSource().split(":")[0];
 	}
 
 	@Override
 	public int getLineNumber() {
-		// TODO Auto-generated method stub
-		return 0;
+		return Integer.parseInt(this.stackTraceElement.getSource().split(":")[1]);
 	}
 
 }

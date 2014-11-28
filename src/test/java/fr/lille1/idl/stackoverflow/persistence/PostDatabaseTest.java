@@ -46,6 +46,6 @@ public class PostDatabaseTest {
 			stackTrace = stackTrace.getCausedBy();
 			count++;
 		}
-		assertEquals(5, count);
+		assertEquals(4, count);
 	}
 }
