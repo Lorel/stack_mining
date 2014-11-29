@@ -1,4 +1,4 @@
-package fr.lille1.idl.stackoverflow.models;
+package fr.lille1.idl.stackoverflow.tables;
 
 import java.io.Serializable;
 

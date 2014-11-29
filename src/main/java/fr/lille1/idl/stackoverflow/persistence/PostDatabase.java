@@ -2,8 +2,9 @@ package fr.lille1.idl.stackoverflow.persistence;
 
 import de.tud.stacktraces.evaluation.datastruct.*;
 import de.tud.stacktraces.evaluation.datastruct.StackTraceElement;
-import fr.lille1.idl.stackoverflow.models.*;
+
 import fr.lille1.idl.stackoverflow.processors.SQLProcessor;
+import fr.lille1.idl.stackoverflow.tables.*;
 
 import java.sql.*;
 import java.util.ArrayList;

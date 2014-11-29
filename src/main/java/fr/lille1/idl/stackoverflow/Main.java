@@ -3,8 +3,11 @@ package fr.lille1.idl.stackoverflow;
 import fr.lille1.idl.stackoverflow.filters.JavaFilter;
 import fr.lille1.idl.stackoverflow.filters.XMLEventFilter;
 import fr.lille1.idl.stackoverflow.models.Post;
+import de.tud.stacktraces.evaluation.datastruct.StackTrace;
+import de.tud.stacktraces.evaluation.datastruct.StackTraceParser;
 import fr.lille1.idl.stackoverflow.processors.SQLProcessor;
 import fr.lille1.idl.stackoverflow.processors.XMLEventProcessor;
+import fr.lille1.idl.stackoverflow.tables.Post;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;

@@ -7,6 +7,7 @@ import fr.lille1.idl.stackoverflow.models.Post;
 import fr.lille1.idl.stackoverflow.models.PostStack;
 import fr.lille1.idl.stackoverflow.models.Stack;
 import fr.lille1.idl.stackoverflow.persistence.PostDatabase;
+import fr.lille1.idl.stackoverflow.tables.Post;
 
 import javax.xml.stream.events.XMLEvent;
 import java.sql.Connection;
