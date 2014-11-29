@@ -27,7 +27,9 @@ public class PostDatabase {
         INSERT_LINK,
         INSERT_STACK,
         INSERT_STACKLINK,
-        INSERT_POSTSTACK;
+        INSERT_POSTSTACK,
+        GET_FRAME,
+        GET_LINK;
     }
 
     private static String ID = "id";
@@ -66,6 +68,12 @@ public class PostDatabase {
         String insertPostStackStatement = "INSERT INTO post_stack(post_id, stack_id, position) VALUES(?, ?, ?);";
         PreparedStatement insertPostStack = connection.prepareStatement(insertPostStackStatement, Statement.RETURN_GENERATED_KEYS);
         this.statements.put(OPERATIONS.INSERT_POSTSTACK, insertPostStack);
+        String getFrameStatement = "SELECT id FROM frame WHERE file_name = ? AND method_name = ? AND line_number = ?";
+        PreparedStatement getFrame = connection.prepareStatement(getFrameStatement);
+        this.statements.put(OPERATIONS.GET_FRAME, getFrame);
+        String getLinkStatement = "SELECT id FROM link WHERE parent_frame_id = ? AND child_frame_id = ? AND next_id = ?";
+        PreparedStatement getLink = connection.prepareStatement(getLinkStatement);
+        this.statements.put(OPERATIONS.GET_LINK, getLink);
     }
 
     /**
@@ -147,7 +155,29 @@ public class PostDatabase {
         return new PostDatabase(SQLProcessor.getConnection());
     }
 
+    public Frame getExisting(Frame frame) throws SQLException {
+        String filename = frame.getFileName();
+        String methodName = frame.getMethodName();
+        int lineNumber = frame.getLineNumber();
+        PreparedStatement statement = statements.get(OPERATIONS.GET_FRAME);
+        statement.setString(1, filename);
+        statement.setString(2, methodName);
+        statement.setInt(3, lineNumber);
+        ResultSet resultSet = statement.executeQuery();
+        statement.clearParameters();
+        if (!resultSet.next()) {
+            return null;
+        }
+        int id = resultSet.getInt(1);
+        Frame existingFrame = new Frame(id, filename, methodName, lineNumber);
+        return existingFrame;
+    }
+
     public Frame insert(Frame frame) throws SQLException {
+        Frame existingFrame = getExisting(frame);
+        if (existingFrame != null) {
+            return existingFrame;
+        }
         PreparedStatement statement = statements.get(OPERATIONS.INSERT_FRAME);
         statement.setString(1, frame.getFileName());
         statement.setString(2, frame.getMethodName());
@@ -161,7 +191,33 @@ public class PostDatabase {
         return frame;
     }
 
+    public Link getExisting(Link link) throws SQLException {
+        Frame parent = link.getParent_frame();
+        Frame child = link.getChild_frame();
+        Link next = link.getNext();
+        PreparedStatement statement = statements.get(OPERATIONS.GET_LINK);
+        statement.setInt(1, parent.getId());
+        statement.setInt(2, child.getId());
+        if (next == null) {
+            statement.setNull(3, Types.INTEGER);
+        } else {
+            statement.setInt(3, next.getId());
+        }
+        ResultSet resultSet = statement.executeQuery();
+        statement.clearParameters();
+        if (!resultSet.next()) {
+            return null;
+        }
+        int id = resultSet.getInt(1);
+        Link existingLink = new Link(id, parent, child, next);
+        return existingLink;
+    }
+
     public Link insert(Link link) throws SQLException {
+        Link existingLink = getExisting(link);
+        if (existingLink != null) {
+            return existingLink;
+        }
         PreparedStatement statement = statements.get(OPERATIONS.INSERT_LINK);
         statement.setInt(1, link.getParent_frame().getId());
         statement.setInt(2, link.getChild_frame().getId());
@@ -252,7 +308,7 @@ public class PostDatabase {
             }
             link = this.insert(link);
             StackLink stackLink = new StackLink(0, stack, link);
-            stackLink = this.insert(stackLink);
+            this.insert(stackLink);
             parentLink = link;
         }
         return stack;
