@@ -3,11 +3,10 @@ package fr.lille1.idl.stackoverflow.processors;
 import de.tud.stacktraces.evaluation.datastruct.StackTrace;
 import de.tud.stacktraces.evaluation.datastruct.StackTraceParser;
 import fr.lille1.idl.stackoverflow.Configuration;
-import fr.lille1.idl.stackoverflow.models.Post;
-import fr.lille1.idl.stackoverflow.models.PostStack;
-import fr.lille1.idl.stackoverflow.models.Stack;
 import fr.lille1.idl.stackoverflow.persistence.PostDatabase;
 import fr.lille1.idl.stackoverflow.tables.Post;
+import fr.lille1.idl.stackoverflow.tables.PostStack;
+import fr.lille1.idl.stackoverflow.tables.Stack;
 
 import javax.xml.stream.events.XMLEvent;
 import java.sql.Connection;
@@ -38,7 +37,6 @@ public class SQLProcessor implements XMLEventProcessor {
         return connection;
     }
 
-    @Override
     public void process(final XMLEvent event) throws Exception {
         Post post = new Post(event);
         database.insert(post);
@@ -51,7 +49,6 @@ public class SQLProcessor implements XMLEventProcessor {
         }
     }
 
-    @Override
     public void close() throws Exception {
         this.database.close();
     }

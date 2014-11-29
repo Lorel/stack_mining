@@ -2,7 +2,7 @@ package fr.lille1.idl.stackoverflow.filters;
 
 import de.tud.stacktraces.evaluation.datastruct.StackTrace;
 import de.tud.stacktraces.evaluation.datastruct.StackTraceParser;
-import fr.lille1.idl.stackoverflow.models.Post;
+import fr.lille1.idl.stackoverflow.tables.Post;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -19,7 +19,6 @@ import java.util.logging.Logger;
 public class JavaFilter implements XMLEventFilter {
     private Logger logger = Logger.getGlobal();
 
-    @Override
     public boolean test(XMLEvent event) throws XMLStreamException {
         if (!event.isStartElement()) {
             return false;
