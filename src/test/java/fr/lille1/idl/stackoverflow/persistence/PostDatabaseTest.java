@@ -42,7 +42,6 @@ public class PostDatabaseTest {
 		StackTrace stackTrace = stackTraceList.get(0);
 		int count = 0;
 		while (stackTrace != null) {
-			System.out.println(stackTrace);
 			stackTrace = stackTrace.getCausedBy();
 			count++;
 		}
