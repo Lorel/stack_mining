@@ -34,7 +34,7 @@ public class XMLWriter implements XMLEventProcessor {
 
     public void close() throws XMLStreamException {
         if (writer != null) {
-            XMLEvent endElement = this.eventFactory.createStartElement(new QName("posts"), null, null);
+            XMLEvent endElement = this.eventFactory.createEndElement(new QName("posts"), null);
             this.writer.add(endElement);
             this.writer.flush();
             this.writer.close();
