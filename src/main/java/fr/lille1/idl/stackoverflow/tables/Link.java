@@ -8,17 +8,17 @@ public class Link implements Serializable {
 
 	private int id;
 	
-	private Frame parent_frame;
+	private Frame parentFrame;
 	
-	private Frame child_frame;
+	private Frame childFrame;
 	
 	private Link next;
 
-	public Link(int id, Frame parent_frame, Frame child_frame, Link next) {
+	public Link(int id, Frame parentFrame, Frame childFrame, Link next) {
 		super();
 		this.setId(id);
-		this.setParent_frame(parent_frame);
-		this.setChild_frame(child_frame);
+		this.setParentFrame(parentFrame);
+		this.setChildFrame(childFrame);
 		this.setNext(next);
 	}
 
@@ -30,20 +30,20 @@ public class Link implements Serializable {
 		this.id = id;
 	}
 
-	public Frame getParent_frame() {
-		return parent_frame;
+	public Frame getParentFrame() {
+		return parentFrame;
 	}
 
-	public void setParent_frame(Frame parent_frame) {
-		this.parent_frame = parent_frame;
+	public void setParentFrame(Frame parentFrame) {
+		this.parentFrame = parentFrame;
 	}
 
-	public Frame getChild_frame() {
-		return child_frame;
+	public Frame getChildFrame() {
+		return childFrame;
 	}
 
-	public void setChild_frame(Frame child_frame) {
-		this.child_frame = child_frame;
+	public void setChildFrame(Frame childFrame) {
+		this.childFrame = childFrame;
 	}
 
 	public Link getNext() {
@@ -59,8 +59,8 @@ public class Link implements Serializable {
 		if (obj instanceof Link) {
 			Link o = (Link) obj;
 			return this.id == o.getId()
-					|| ( this.getParent_frame() == o.getParent_frame()
-						&& this.getChild_frame() == o.getChild_frame()
+					|| ( this.getParentFrame() == o.getParentFrame()
+						&& this.getChildFrame() == o.getChildFrame()
 						&& this.next == o.getNext()
 						);
 		}

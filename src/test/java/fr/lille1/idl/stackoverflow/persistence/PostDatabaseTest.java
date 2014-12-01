@@ -68,7 +68,7 @@ public class PostDatabaseTest {
 		
 		assertNotNull(link);
 		
-		Link searchedLink = new Link(0, link.getParent_frame(), link.getChild_frame(), link.getNext());
+		Link searchedLink = new Link(0, link.getParentFrame(), link.getChildFrame(), link.getNext());
 		
 		assertEquals(link, postDatabase.getExisting(searchedLink));
 	}

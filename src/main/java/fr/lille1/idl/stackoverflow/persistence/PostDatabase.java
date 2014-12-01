@@ -223,8 +223,8 @@ public class PostDatabase {
     }
 
     public Link getExisting(Link link) throws SQLException {
-        Frame parent = link.getParent_frame();
-        Frame child = link.getChild_frame();
+        Frame parent = link.getParentFrame();
+        Frame child = link.getChildFrame();
         Link next = link.getNext();
         PreparedStatement statement = statements.get(OPERATIONS.GET_LINK);
         statement.setInt(1, parent.getId());
@@ -252,8 +252,8 @@ public class PostDatabase {
             return existingLink;
         }
         PreparedStatement statement = statements.get(OPERATIONS.INSERT_LINK);
-        statement.setInt(1, link.getParent_frame().getId());
-        statement.setInt(2, link.getChild_frame().getId());
+        statement.setInt(1, link.getParentFrame().getId());
+        statement.setInt(2, link.getChildFrame().getId());
         if (link.getNext() != null) {
             statement.setInt(3, link.getNext().getId());
         } else {
