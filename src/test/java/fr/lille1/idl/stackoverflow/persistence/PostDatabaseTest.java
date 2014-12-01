@@ -16,8 +16,9 @@ import static org.junit.Assert.fail;
 import de.tud.stacktraces.evaluation.datastruct.StackTrace;
 import de.tud.stacktraces.evaluation.datastruct.StackTraceParser;
 import fr.lille1.idl.stackoverflow.Configuration;
+import fr.lille1.idl.stackoverflow.tables.Frame;
+import fr.lille1.idl.stackoverflow.tables.Link;
 import fr.lille1.idl.stackoverflow.tables.Post;
-import junit.framework.TestCase;
 
 public class PostDatabaseTest {
 	
@@ -46,5 +47,29 @@ public class PostDatabaseTest {
 			count++;
 		}
 		assertEquals(4, count);
+	}
+	
+	@Test
+	public void testGetExistingLink() throws ClassNotFoundException, SQLException {
+		PostDatabase postDatabase = PostDatabase.getInstance();
+		Link link = postDatabase.find_link_by_id(1);
+		
+		if (link == null) {
+			Frame frame1 = postDatabase.find_frame_by_id(1);
+			if (frame1 == null) {
+				frame1 = postDatabase.insert(new Frame(0,"testFrameFile1","testFrameMethod1", 42));
+			}
+			Frame frame2 = postDatabase.find_frame_by_id(2);
+			if (frame2 == null) {
+				frame2 = postDatabase.insert(new Frame(0,"testFrameFile2","testFrameMethod2", 43));
+			}
+			link = postDatabase.insert(new Link(0, frame1, frame2, null));
+		}
+		
+		assertNotNull(link);
+		
+		Link searchedLink = new Link(0, link.getParent_frame(), link.getChild_frame(), link.getNext());
+		
+		assertEquals(link, postDatabase.getExisting(searchedLink));
 	}
 }

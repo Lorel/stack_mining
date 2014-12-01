@@ -2,7 +2,6 @@ package fr.lille1.idl.stackoverflow.persistence;
 
 import de.tud.stacktraces.evaluation.datastruct.*;
 import de.tud.stacktraces.evaluation.datastruct.StackTraceElement;
-
 import fr.lille1.idl.stackoverflow.processors.SQLProcessor;
 import fr.lille1.idl.stackoverflow.tables.*;
 
@@ -29,15 +28,29 @@ public class PostDatabase {
         INSERT_STACKLINK,
         INSERT_POSTSTACK,
         GET_FRAME,
-        GET_LINK;
+        GET_LINK,
+        FIND_LINK_BY_ID,
+        FIND_FRAME_BY_ID;
     }
 
     private static String ID = "id";
+    
+    // POSTS
     private static String TITLE = "title";
     private static String BODY = "body";
     private static String ACCEPTED_ANSWER = "accepted_answer_id";
     private static String DATE = "creation_date";
 
+    // LINKS
+    private static String PARENT_FRAME = "parent_frame_id";
+    private static String CHILD_FRAME = "child_frame_id";
+    private static String NEXT = "next_id";
+    
+    // FRAMES
+    private static String FILE_NAME = "file_name";
+    private static String METHOD_NAME = "method_name";
+    private static String LINE_NUMBER = "line_number";
+    
     private Connection connection;
     private Map<OPERATIONS, PreparedStatement> statements = null;
 
@@ -74,7 +87,13 @@ public class PostDatabase {
         String getLinkStatement = "SELECT id FROM link WHERE parent_frame_id = ? AND child_frame_id = ? AND next_id = ?";
         PreparedStatement getLink = connection.prepareStatement(getLinkStatement);
         this.statements.put(OPERATIONS.GET_LINK, getLink);
-    }
+        String findLinkStatement = "SELECT * FROM link WHERE " + ID + " = ?";
+        PreparedStatement findLinkPreparedStatement = this.connection.prepareStatement(findLinkStatement);
+        this.statements.put(OPERATIONS.FIND_LINK_BY_ID, findLinkPreparedStatement);
+        String findFrameStatement = "SELECT * FROM frame WHERE " + ID + " = ?";
+        PreparedStatement findFramePreparedStatement = this.connection.prepareStatement(findFrameStatement);
+        this.statements.put(OPERATIONS.FIND_FRAME_BY_ID, findFramePreparedStatement);
+}
 
     /**
      * Insert a post in the database.
@@ -313,4 +332,37 @@ public class PostDatabase {
         }
         return stack;
     }
+
+	public Link find_link_by_id(int id) throws SQLException {
+		PreparedStatement statement = this.statements.get(OPERATIONS.FIND_LINK_BY_ID);
+        statement.setInt(1, id);
+        final ResultSet resultSet = statement.executeQuery();
+        statement.clearParameters();
+        if (!resultSet.next()) {
+            resultSet.close();
+            return null;
+        }
+        int parentFrameId = resultSet.getInt(PARENT_FRAME);
+        int childFrameId = resultSet.getInt(CHILD_FRAME);
+        int nextId = resultSet.getInt(NEXT);
+        resultSet.close();
+        Link link = new Link(id, this.find_frame_by_id(parentFrameId), this.find_frame_by_id(childFrameId), this.find_link_by_id(nextId));
+		return link;
+	}
+
+	public Frame find_frame_by_id(int id) throws SQLException {
+		PreparedStatement statement = this.statements.get(OPERATIONS.FIND_FRAME_BY_ID);
+        statement.setInt(1, id);
+        final ResultSet resultSet = statement.executeQuery();
+        statement.clearParameters();
+        if (!resultSet.next()) {
+            resultSet.close();
+            return null;
+        }
+        String fileName = resultSet.getString(FILE_NAME);
+        String methodName = resultSet.getString(METHOD_NAME);
+        int lineNumber = resultSet.getInt(LINE_NUMBER);
+        Frame frame = new Frame(id, fileName, methodName, lineNumber);
+		return frame;
+	}
 }
