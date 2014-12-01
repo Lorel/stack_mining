@@ -17,7 +17,6 @@ import de.tud.stacktraces.evaluation.datastruct.StackTrace;
 import de.tud.stacktraces.evaluation.datastruct.StackTraceParser;
 import fr.lille1.idl.stackoverflow.Configuration;
 import fr.lille1.idl.stackoverflow.tables.Post;
-import junit.framework.TestCase;
 
 public class PostDatabaseTest {
 	

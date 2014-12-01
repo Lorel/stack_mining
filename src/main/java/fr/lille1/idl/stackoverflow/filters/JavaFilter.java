@@ -1,7 +1,7 @@
 package fr.lille1.idl.stackoverflow.filters;
 
-import de.tud.stacktraces.evaluation.datastruct.StackTrace;
-import de.tud.stacktraces.evaluation.datastruct.StackTraceParser;
+import fr.lille1.idl.stackoverflow.parsers.StackTraceItf;
+import fr.lille1.idl.stackoverflow.parsers.java.JavaStackTraceParser;
 import fr.lille1.idl.stackoverflow.tables.Post;
 
 import javax.xml.namespace.QName;
@@ -9,6 +9,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,9 +37,9 @@ public class JavaFilter implements XMLEventFilter {
             return false;
         }
         Post post = new Post(event);
-        List<StackTrace> traces = null;
+        List<StackTraceItf> traces = null;
         try {
-            traces = StackTraceParser.parseAll(post.getBody());
+            traces = (new JavaStackTraceParser()).parseAll(post.getBody());
         } catch (StackOverflowError e) {
             logger.log(Level.SEVERE, "Crashed on post " + post.getId(), e);
             logger.log(Level.INFO, event.toString());

@@ -1,6 +1,5 @@
 package fr.lille1.idl.stackoverflow.parsers.java;
 
-import de.tud.stacktraces.evaluation.datastruct.StackTrace;
 import fr.lille1.idl.stackoverflow.parsers.StackTraceItf;
 
 import java.util.List;
@@ -36,7 +35,7 @@ public class JavaStackTraceParserTest {
 				+ "at org.jnp.interfaces.TimedSocketFactory.createSocket(TimedSocketFactory.java:69)\n"
 				+ "at org.jnp.interfaces.TimedSocketFactory.createSocket(TimedSocketFactory.java:62)\n"
 				+ "at org.jnp.interfaces.NamingContext.getServer(NamingContext.java:224)";
-		List<StackTraceItf> traces = (new JavaStackTraceParser()).parseText(text);
+		List<StackTraceItf> traces = (new JavaStackTraceParser()).parseAll(text);
 		assertEquals(1, traces.size()); //, "le parser ne doit renvoyer qu'une stacktrace");
 	}
 }

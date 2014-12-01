@@ -1,8 +1,7 @@
 package fr.lille1.idl.stackoverflow.persistence;
 
-import de.tud.stacktraces.evaluation.datastruct.*;
-import de.tud.stacktraces.evaluation.datastruct.StackTraceElement;
-
+import fr.lille1.idl.stackoverflow.parsers.StackTraceElementItf;
+import fr.lille1.idl.stackoverflow.parsers.StackTraceItf;
 import fr.lille1.idl.stackoverflow.processors.SQLProcessor;
 import fr.lille1.idl.stackoverflow.tables.*;
 
@@ -11,8 +10,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Created by dorian on 22/11/14.
@@ -218,23 +215,15 @@ public class PostDatabase {
         return postStack;
     }
 
-    public Stack insert(StackTrace stackTrace) throws SQLException {
-        List<StackTraceElement> elements = stackTrace.getElements();
+    public Stack insert(StackTraceItf stackTrace) throws SQLException {
+        List<StackTraceElementItf> elements = stackTrace.getStackTraceElements();
         List<Link> links = new ArrayList<Link>();
         Frame parent = null;
         for (int i = elements.size() - 1; i >= 0; i--) {
-            StackTraceElement element = elements.get(i);
-            String[] tokens = element.getSource().split(":");
-            String fileName = tokens[0].trim();
+            StackTraceElementItf element = elements.get(i);
+            String fileName = element.getFileName();
             String methodName = element.getMethod();
-            int lineNumber = -1;
-            if (tokens.length == 2) {
-                try {
-                    lineNumber = Integer.parseInt(tokens[1].trim().replaceAll(" ", ""));
-                } catch (NumberFormatException e) {
-                    Logger.getGlobal().log(Level.WARNING, e.getMessage(), e);
-                }
-            }
+            int lineNumber = element.getLineNumber();
             Frame child = new Frame(0, fileName, methodName, lineNumber);
             child = this.insert(child);
             if (parent != null) {
