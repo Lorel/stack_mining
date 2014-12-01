@@ -5,7 +5,6 @@ import de.tud.stacktraces.evaluation.datastruct.StackTraceParser;
 import fr.lille1.idl.stackoverflow.tables.Post;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
@@ -19,7 +18,7 @@ import java.util.logging.Logger;
 public class JavaFilter implements XMLEventFilter {
     private Logger logger = Logger.getGlobal();
 
-    public boolean test(XMLEvent event) throws XMLStreamException {
+    public boolean test(XMLEvent event) {
         if (!event.isStartElement()) {
             return false;
         }
@@ -29,10 +28,19 @@ public class JavaFilter implements XMLEventFilter {
             return false;
         }
         Attribute acceptedAnswer = start.getAttributeByName(new QName("AcceptedAnswerId"));
+        if (acceptedAnswer == null) {
+            return false;
+        }
         Attribute parentId = start.getAttributeByName(new QName("parentId"));
+        if (parentId == null) {
+            return false;
+        }
         Attribute tagsAttribute = start.getAttributeByName(new QName("Tags"));
+        if (tagsAttribute == null) {
+            return false;
+        }
         String tags = tagsAttribute.toString().toLowerCase();
-        if (acceptedAnswer == null || parentId != null || !tags.contains("java") || tags.contains("javascript")) {
+        if (!tags.contains("java") || tags.contains("javascript")) {
             return false;
         }
         Post post = new Post(event);
