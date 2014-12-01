@@ -57,7 +57,7 @@ public class PostDatabaseTest {
 		if (link == null) {
 			Frame frame1 = postDatabase.find_frame_by_id(1);
 			if (frame1 == null) {
-				frame1 = postDatabase.insert(new Frame(0,"testFrameFile1","testFrameMethod1", 42));
+				frame1 = postDatabase.insert(new Frame(0,"testFrameFile","testFrameMethod", 42));
 			}
 			Frame frame2 = postDatabase.find_frame_by_id(2);
 			if (frame2 == null) {

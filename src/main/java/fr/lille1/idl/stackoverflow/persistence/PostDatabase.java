@@ -57,39 +57,51 @@ public class PostDatabase {
     public PostDatabase(Connection connection) throws SQLException {
         this.connection = connection;
         this.statements = new HashMap<OPERATIONS, PreparedStatement>();
+        
         String insertStatement = "INSERT INTO post(" + ID + ", " + TITLE + ", " + BODY + ", " + ACCEPTED_ANSWER + ", " + DATE + ") VALUES(?, ?, ?, ?, ?)";
         PreparedStatement insertPreparedStatement = this.connection.prepareStatement(insertStatement);
         this.statements.put(OPERATIONS.INSERT, insertPreparedStatement);
+        
         String findStatement = "SELECT * FROM post WHERE " + ID + " = ?";
         PreparedStatement findPreparedStatement = this.connection.prepareStatement(findStatement);
         this.statements.put(OPERATIONS.FIND_BY_ID, findPreparedStatement);
+        
         String listIdsStatement = "SELECT " + ID + " FROM post";
         PreparedStatement listIdsPreparedStatement = this.connection.prepareStatement(listIdsStatement);
         this.statements.put(OPERATIONS.LIST_IDS, listIdsPreparedStatement);
+        
         String insertFrameStatement = "INSERT INTO frame(file_name, method_name, line_number) VALUES(?, ?, ?);";
         PreparedStatement insertFrame = connection.prepareStatement(insertFrameStatement, Statement.RETURN_GENERATED_KEYS);
         this.statements.put(OPERATIONS.INSERT_FRAME, insertFrame);
+        
         String insertLinkStatement = "INSERT INTO link(parent_frame_id, child_frame_id, next_id) VALUES(?, ?, ?);";
         PreparedStatement insertLink = connection.prepareStatement(insertLinkStatement, Statement.RETURN_GENERATED_KEYS);
         this.statements.put(OPERATIONS.INSERT_LINK, insertLink);
+        
         String insertStackStatement = "INSERT INTO stack(language) VALUES(?);";
         PreparedStatement insertStack = connection.prepareStatement(insertStackStatement, Statement.RETURN_GENERATED_KEYS);
         this.statements.put(OPERATIONS.INSERT_STACK, insertStack);
+        
         String insertStackLinkStatement = "INSERT INTO stack_link(stack_id, link_id) VALUES(?, ?) ";
         PreparedStatement insertStackLink = connection.prepareStatement(insertStackLinkStatement, Statement.RETURN_GENERATED_KEYS);
         this.statements.put(OPERATIONS.INSERT_STACKLINK, insertStackLink);
+        
         String insertPostStackStatement = "INSERT INTO post_stack(post_id, stack_id, position) VALUES(?, ?, ?);";
         PreparedStatement insertPostStack = connection.prepareStatement(insertPostStackStatement, Statement.RETURN_GENERATED_KEYS);
         this.statements.put(OPERATIONS.INSERT_POSTSTACK, insertPostStack);
+        
         String getFrameStatement = "SELECT id FROM frame WHERE file_name = ? AND method_name = ? AND line_number = ?";
         PreparedStatement getFrame = connection.prepareStatement(getFrameStatement);
         this.statements.put(OPERATIONS.GET_FRAME, getFrame);
-        String getLinkStatement = "SELECT id FROM link WHERE parent_frame_id = ? AND child_frame_id = ? AND next_id = ?";
+        
+        String getLinkStatement = "SELECT id FROM link WHERE parent_frame_id = ? AND child_frame_id = ? AND (? is null AND next_id is null OR next_id = ?)";
         PreparedStatement getLink = connection.prepareStatement(getLinkStatement);
         this.statements.put(OPERATIONS.GET_LINK, getLink);
+        
         String findLinkStatement = "SELECT * FROM link WHERE " + ID + " = ?";
         PreparedStatement findLinkPreparedStatement = this.connection.prepareStatement(findLinkStatement);
         this.statements.put(OPERATIONS.FIND_LINK_BY_ID, findLinkPreparedStatement);
+        
         String findFrameStatement = "SELECT * FROM frame WHERE " + ID + " = ?";
         PreparedStatement findFramePreparedStatement = this.connection.prepareStatement(findFrameStatement);
         this.statements.put(OPERATIONS.FIND_FRAME_BY_ID, findFramePreparedStatement);
@@ -219,8 +231,10 @@ public class PostDatabase {
         statement.setInt(2, child.getId());
         if (next == null) {
             statement.setNull(3, Types.INTEGER);
+            statement.setNull(4, Types.INTEGER);
         } else {
             statement.setInt(3, next.getId());
+            statement.setInt(4, next.getId());
         }
         ResultSet resultSet = statement.executeQuery();
         statement.clearParameters();

@@ -54,4 +54,16 @@ public class Link implements Serializable {
 		this.next = next;
 	}
 	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Link) {
+			Link o = (Link) obj;
+			return this.id == o.getId()
+					|| ( this.getParent_frame() == o.getParent_frame()
+						&& this.getChild_frame() == o.getChild_frame()
+						&& this.next == o.getNext()
+						);
+		}
+		return false;
+	}
 }
