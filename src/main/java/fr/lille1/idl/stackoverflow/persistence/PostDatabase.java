@@ -34,7 +34,7 @@ public class PostDatabase {
     }
 
     private static String ID = "id";
-    
+
     // POSTS
     private static String TITLE = "title";
     private static String BODY = "body";
@@ -45,12 +45,12 @@ public class PostDatabase {
     private static String PARENT_FRAME = "parent_frame_id";
     private static String CHILD_FRAME = "child_frame_id";
     private static String NEXT = "next_id";
-    
+
     // FRAMES
     private static String FILE_NAME = "file_name";
     private static String METHOD_NAME = "method_name";
     private static String LINE_NUMBER = "line_number";
-    
+
     private Connection connection;
     private Map<OPERATIONS, PreparedStatement> statements = null;
 
@@ -93,7 +93,7 @@ public class PostDatabase {
         String findFrameStatement = "SELECT * FROM frame WHERE " + ID + " = ?";
         PreparedStatement findFramePreparedStatement = this.connection.prepareStatement(findFrameStatement);
         this.statements.put(OPERATIONS.FIND_FRAME_BY_ID, findFramePreparedStatement);
-}
+    }
 
     /**
      * Insert a post in the database.
@@ -299,18 +299,7 @@ public class PostDatabase {
         Frame parent = null;
         for (int i = elements.size() - 1; i >= 0; i--) {
             StackTraceElement element = elements.get(i);
-            String[] tokens = element.getSource().split(":");
-            String fileName = tokens[0].trim();
-            String methodName = element.getMethod();
-            int lineNumber = -1;
-            if (tokens.length == 2) {
-                try {
-                    lineNumber = Integer.parseInt(tokens[1].trim().replaceAll(" ", ""));
-                } catch (NumberFormatException e) {
-                    Logger.getGlobal().log(Level.WARNING, e.getMessage(), e);
-                }
-            }
-            Frame child = new Frame(0, fileName, methodName, lineNumber);
+            Frame child = toFrame(element);
             child = this.insert(child);
             if (parent != null) {
                 Link link = new Link(0, parent, child, null);
@@ -333,8 +322,8 @@ public class PostDatabase {
         return stack;
     }
 
-	public Link find_link_by_id(int id) throws SQLException {
-		PreparedStatement statement = this.statements.get(OPERATIONS.FIND_LINK_BY_ID);
+    public Link find_link_by_id(int id) throws SQLException {
+        PreparedStatement statement = this.statements.get(OPERATIONS.FIND_LINK_BY_ID);
         statement.setInt(1, id);
         final ResultSet resultSet = statement.executeQuery();
         statement.clearParameters();
@@ -347,11 +336,11 @@ public class PostDatabase {
         int nextId = resultSet.getInt(NEXT);
         resultSet.close();
         Link link = new Link(id, this.find_frame_by_id(parentFrameId), this.find_frame_by_id(childFrameId), this.find_link_by_id(nextId));
-		return link;
-	}
+        return link;
+    }
 
-	public Frame find_frame_by_id(int id) throws SQLException {
-		PreparedStatement statement = this.statements.get(OPERATIONS.FIND_FRAME_BY_ID);
+    public Frame find_frame_by_id(int id) throws SQLException {
+        PreparedStatement statement = this.statements.get(OPERATIONS.FIND_FRAME_BY_ID);
         statement.setInt(1, id);
         final ResultSet resultSet = statement.executeQuery();
         statement.clearParameters();
@@ -363,6 +352,71 @@ public class PostDatabase {
         String methodName = resultSet.getString(METHOD_NAME);
         int lineNumber = resultSet.getInt(LINE_NUMBER);
         Frame frame = new Frame(id, fileName, methodName, lineNumber);
-		return frame;
-	}
+        return frame;
+    }
+
+    /**
+     * Transforms a StackTraceElement into  a Frame.
+     *
+     * @param element original element
+     * @return A Frame
+     */
+    private Frame toFrame(final StackTraceElement element) {
+        String[] tokens = element.getSource().split(":");
+        String fileName = tokens[0].trim();
+        String methodName = element.getMethod();
+        int lineNumber = -1;
+        if (tokens.length == 2) {
+            try {
+                lineNumber = Integer.parseInt(tokens[1].trim().replaceAll(" ", ""));
+            } catch (NumberFormatException e) {
+                Logger.getGlobal().log(Level.WARNING, e.getMessage(), e);
+            }
+        }
+        Frame frame = new Frame(0, fileName, methodName, lineNumber);
+        return frame;
+    }
+
+    /**
+     * Look for an identical stack trace in the database.
+     *
+     * @param stackTrace Stack trace to look for
+     * @return A list of posts containing an identical stack trace
+     */
+    public List<Post> find(StackTrace stackTrace) throws SQLException {
+        List<Post> posts = new ArrayList<Post>();
+        //Test if the frames exist in the database
+        List<StackTraceElement> elements = stackTrace.getElements();
+        List<Frame> frames = new ArrayList<Frame>();
+        for (int i = elements.size() - 1; i >= 0; i--) {
+            StackTraceElement element = elements.get(i);
+            Frame existingFrame = getExisting(toFrame(element));
+            if (existingFrame == null) {
+                return posts;
+            }
+            frames.add(existingFrame);
+        }
+        //TODO : Use a prepared statement in place of dumb query
+        String statement = "SELECT p.id, p.accepted_answer_id FROM post p, post_stack ps, stack s ";
+        String from = "";
+        String where = "";
+        for (int i = 0; i < frames.size() - 1; i++) {
+            String linkName = "l" + i;
+            String stackLinkName = "sl" + i;
+            from += ", stack_link " + stackLinkName + ", link " + linkName;
+            where += " AND " + stackLinkName + ".stack_id = s.id  AND " + stackLinkName + ".link_id = " + linkName + ".id";
+            where += " AND " + linkName + ".parent_frame_id = " + frames.get(i).getId() + " AND " + linkName + ".child_frame_id = " + frames.get(i + 1).getId();
+        }
+        statement += from;
+        statement += " WHERE p.id = ps.post_id AND ps.stack_id = s.id ";
+        statement += where;
+        Statement query = connection.createStatement();
+        ResultSet set = query.executeQuery(statement);
+        while (set.next()) {
+            int id = set.getInt(1);
+            Post post = find(id);
+            posts.add(post);
+        }
+        return posts;
+    }
 }
