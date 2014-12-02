@@ -53,14 +53,17 @@ public class Search {
             }
         }
         String text = new String(Files.readAllBytes(Paths.get(filename)));
-        StackTrackParserItf parser = new JavaStackTraceParser();
-        StackTrace stackTrace = StackTraceParser.parse(text);
-        if (stackTrace != null) {
-            List<Post> posts = PostDatabase.getInstance().find(stackTrace);
-            for (Post post : posts) {
-                String message = "http://stackoverflow.com/questions/" + post.getId() + "\t" + post.getTitle();
-                System.out.println(message);
-                logger.log(Level.INFO, message);
+        List<StackTrace> stackTraces = StackTraceParser.parseAll(text);
+        if (!stackTraces.isEmpty()) {
+            for (StackTrace stackTrace : stackTraces) {
+                System.out.println(stackTrace);
+                List<Post> posts = PostDatabase.getInstance().find(stackTrace);
+                System.out.println("posts : " + posts.size());
+                for (Post post : posts) {
+                    String message = "http://stackoverflow.com/questions/" + post.getId() + "\t" + post.getTitle();
+                    System.out.println(message);
+                    logger.log(Level.INFO, message);
+                }
             }
         } else {
             logger.log(Level.WARNING, "Did not find any stack trace in input file " + filename);

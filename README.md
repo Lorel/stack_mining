@@ -13,10 +13,13 @@ This project was developped using the following technologies:
 * mysql-server 5.5
 
 ## Run the extraction
+In order to run the project, you must have a valid configuration file at the root of the project such as the one in *src/main/resources/*.
+If you don't, copy *src/main/resources/config.properties* at the root of the project and tweak it to reflect your installation needs.
 ```bash
 mvn package
 java -jar target/so-extractor-1.0-SNAPSHOT-jar-with-dependencies.jar path/to/Posts.xml
 ```
+
 
 execute sql
 ```bash
@@ -28,6 +31,9 @@ mysql -h jenkins-lorel.cloudapp.net -P 443 -p -u stackoverflow stackoverflow < f
 ```bash
 mvn -f pom_search.xml package
 ```
+
+Just like the extractor, this program requires a valid configuration file.
+If you don't have one copy the one from *src/main/resources/* at the root of the directory and tune it to your needs.
 
 ### Running the program
 ```bash
