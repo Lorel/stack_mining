@@ -1,8 +1,8 @@
 all: clean
-	pdflatex model.tex
-	bibtex model
-	pdflatex model.tex
-	pdflatex model.tex
+	pdflatex main.tex
+	bibtex references
+	pdflatex main.tex
+	pdflatex main.tex
 
 clean:
 	rm -f *.aux *.out *.synctex.gz *.toc
