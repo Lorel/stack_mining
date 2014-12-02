@@ -8,7 +8,7 @@ import de.tud.stacktraces.evaluation.datastruct.StackTraceElement;
 import fr.lille1.idl.stackoverflow.parsers.StackTraceElementItf;
 import fr.lille1.idl.stackoverflow.parsers.StackTraceItf;
 
-public class JavaStackTrace extends StackTrace implements StackTraceItf {
+public class JavaStackTrace implements StackTraceItf {
 	
 	private StackTrace stackTrace;
 	private JavaStackTrace next;
