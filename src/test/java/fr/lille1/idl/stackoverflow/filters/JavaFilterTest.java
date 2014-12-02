@@ -1,17 +1,16 @@
 package fr.lille1.idl.stackoverflow.filters;
 
-import junit.framework.TestCase;
-import org.junit.Test;
+import static org.junit.Assert.assertFalse;
 
-import javax.xml.stream.XMLEventFactory;
+import java.io.FileInputStream;
+import java.io.IOException;
+
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
-import java.io.FileInputStream;
-import java.io.IOException;
 
-import static org.junit.Assert.assertFalse;
+import org.junit.Test;
 
 /**
  * Created by dorian on 01/12/14.

@@ -1,8 +1,7 @@
 package fr.lille1.idl.stackoverflow;
 
-import de.tud.stacktraces.evaluation.datastruct.StackTrace;
-import de.tud.stacktraces.evaluation.datastruct.StackTraceParser;
-import fr.lille1.idl.stackoverflow.parsers.StackTrackParserItf;
+import fr.lille1.idl.stackoverflow.parsers.StackTraceItf;
+import fr.lille1.idl.stackoverflow.parsers.StackTraceParserItf;
 import fr.lille1.idl.stackoverflow.parsers.java.JavaStackTraceParser;
 import fr.lille1.idl.stackoverflow.persistence.PostDatabase;
 import fr.lille1.idl.stackoverflow.tables.Post;
@@ -22,7 +21,7 @@ import java.util.logging.*;
 public class Search {
     public static final String USAGE = "Usage : java -jar search-jar-with-dependencies.jar path/to/text.file";
 
-    public static void main(String[] args) throws IOException, StackTraceParser.ParseException, SQLException, ClassNotFoundException {
+    public static void main(String[] args) throws IOException, StackTraceParserItf.ParseException, SQLException, ClassNotFoundException {
         if (args.length != 1) {
             System.out.println(USAGE);
             System.exit(0);
@@ -53,9 +52,9 @@ public class Search {
             }
         }
         String text = new String(Files.readAllBytes(Paths.get(filename)));
-        List<StackTrace> stackTraces = StackTraceParser.parseAll(text);
+        List<StackTraceItf> stackTraces = (new JavaStackTraceParser()).parseAll(text);
         if (!stackTraces.isEmpty()) {
-            for (StackTrace stackTrace : stackTraces) {
+            for (StackTraceItf stackTrace : stackTraces) {
                 System.out.println(stackTrace);
                 List<Post> posts = PostDatabase.getInstance().find(stackTrace);
                 System.out.println("posts : " + posts.size());
