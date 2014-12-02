@@ -66,9 +66,10 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>fr.lille1.idl.stackoverflow.Main</mainClass>
+                            <mainClass>fr.lille1.idl.stackoverflow.Search</mainClass>
                         </manifest>
                     </archive>
+                    <finalName>search</finalName>
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>

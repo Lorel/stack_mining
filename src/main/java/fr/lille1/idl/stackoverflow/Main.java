@@ -1,17 +1,14 @@
 package fr.lille1.idl.stackoverflow;
 
-import de.tud.stacktraces.evaluation.datastruct.StackTrace;
-import de.tud.stacktraces.evaluation.datastruct.StackTraceParser;
-import fr.lille1.idl.stackoverflow.models.Post;
+import fr.lille1.idl.stackoverflow.filters.JavaFilter;
+import fr.lille1.idl.stackoverflow.filters.XMLEventFilter;
 import fr.lille1.idl.stackoverflow.processors.SQLProcessor;
 import fr.lille1.idl.stackoverflow.processors.XMLEventProcessor;
+import fr.lille1.idl.stackoverflow.tables.Post;
 
-import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.Attribute;
-import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -65,9 +62,6 @@ public class Main {
         try {
             xmlInputStream = new FileInputStream(filename);
         } catch (FileNotFoundException e) {
-            if (xmlInputStream != null) {
-                xmlInputStream.close();
-            }
             logger.log(Level.SEVERE, "Could not find input XML file", e);
             System.exit(3);
         }
@@ -89,6 +83,7 @@ public class Main {
             logger.log(Level.SEVERE, "Could not initialize SQL prepared statement", e);
             System.exit(6);
         }
+        XMLEventFilter filter = new JavaFilter();
         try {
             while (reader.hasNext()) {
                 if ((nodesCounter % 1000) == 0) {
@@ -96,38 +91,15 @@ public class Main {
                 }
                 XMLEvent event = reader.nextEvent();
                 nodesCounter++;
-                if (event.isStartElement()) {
-                    postsCounter++;
-                    StartElement start = event.asStartElement();
-                    QName startName = start.getName();
-                    if (!startName.toString().trim().equalsIgnoreCase("row")) {
-                        continue;
-                    }
-                    Attribute acceptedAnswer = start.getAttributeByName(new QName("AcceptedAnswerId"));
-                    Attribute parentId = start.getAttributeByName(new QName("parentId"));
-                    Attribute tagsAttribute = start.getAttributeByName(new QName("Tags"));
-                    String tags = tagsAttribute.toString().toLowerCase();
-                    if (acceptedAnswer != null && parentId == null && tags.contains("java") && !tags.contains("javascript")) {
-                        Post post = new Post(event);
-                        List<StackTrace> traces = null;
+                if (filter.test(event)) {
+                    Post post = new Post(event);
+                    interestingPostsCounter++;
+                    for (XMLEventProcessor processor : processors) {
                         try {
-                            traces = StackTraceParser.parseAll(post.getBody());
-                        } catch (StackOverflowError e) {
-                            logger.log(Level.SEVERE, "Crashed on post " + post.getId(), e);
-                            logger.log(Level.INFO, event.toString());
-                            continue;
-                        }
-                        if (traces.isEmpty()) {
-                            continue;
-                        }
-                        interestingPostsCounter++;
-                        for (XMLEventProcessor processor : processors) {
-                            try {
-                                logger.log(Level.INFO, "processing post " + post.getId());
-                                processor.process(event);
-                            } catch (Exception processingException) {
-                                logger.log(Level.WARNING, "error processing post " + post.getId() + " : " + processingException.getMessage(), processingException);
-                            }
+                            logger.log(Level.INFO, "processing post " + post.getId());
+                            processor.process(event);
+                        } catch (Exception processingException) {
+                            logger.log(Level.WARNING, "error processing post " + post.getId() + " : " + processingException.getMessage(), processingException);
                         }
                     }
                 }
@@ -145,6 +117,6 @@ public class Main {
 
         }
         long ending = System.nanoTime();
-        System.out.println("Time spent : " + (ending - beginning) + " ns");
+        logger.log(Level.INFO, "Time spent : " + (ending - beginning) + " ns");
     }
 }
