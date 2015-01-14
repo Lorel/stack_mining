@@ -11,6 +11,7 @@ import fr.lille1.idl.stackoverflow.parsers.StackTraceItf;
 public class JavaStackTrace implements StackTraceItf {
 	
 	private StackTrace stackTrace;
+	// TODO check if useful, unless remove
 	private JavaStackTrace next;
 	private JavaStackTrace parent;
 	
