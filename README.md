@@ -21,7 +21,7 @@ java -jar target/so-extractor-1.0-SNAPSHOT-jar-with-dependencies.jar path/to/Pos
 ```
 
 
-execute sql
+Execute sql file on cloud MySQL server
 ```bash
 mysql -h jenkins-lorel.cloudapp.net -P 443 -p -u stackoverflow stackoverflow < file.sql
 ```

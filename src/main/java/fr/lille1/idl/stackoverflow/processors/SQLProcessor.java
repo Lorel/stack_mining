@@ -1,14 +1,15 @@
 package fr.lille1.idl.stackoverflow.processors;
 
-import de.tud.stacktraces.evaluation.datastruct.StackTrace;
-import de.tud.stacktraces.evaluation.datastruct.StackTraceParser;
 import fr.lille1.idl.stackoverflow.Configuration;
+import fr.lille1.idl.stackoverflow.parsers.StackTraceItf;
+import fr.lille1.idl.stackoverflow.parsers.StackTraceParserItf;
 import fr.lille1.idl.stackoverflow.persistence.PostDatabase;
 import fr.lille1.idl.stackoverflow.tables.Post;
 import fr.lille1.idl.stackoverflow.tables.PostStack;
 import fr.lille1.idl.stackoverflow.tables.Stack;
 
 import javax.xml.stream.events.XMLEvent;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -19,9 +20,11 @@ import java.util.List;
  */
 public class SQLProcessor implements XMLEventProcessor {
     private PostDatabase database;
+    private StackTraceParserItf parser;
 
-    public SQLProcessor() throws SQLException, ClassNotFoundException {
+    public SQLProcessor(StackTraceParserItf parser) throws SQLException, ClassNotFoundException {
         this.database = new PostDatabase(getConnection());
+        this.parser = parser;
     }
 
     public static Connection getConnection() throws ClassNotFoundException, SQLException {
@@ -40,9 +43,9 @@ public class SQLProcessor implements XMLEventProcessor {
     public void process(final XMLEvent event) throws Exception {
         Post post = new Post(event);
         database.insert(post);
-        List<StackTrace> traces = StackTraceParser.parseAll(post.getBody());
+        List<StackTraceItf> traces = this.parser.parseAll(post.getBody());
         for (int i = 0; i < traces.size(); i++) {
-            StackTrace trace = traces.get(i);
+            StackTraceItf trace = traces.get(i);
             Stack stack = database.insert(trace);
             PostStack postStack = new PostStack(0, post, stack, i);
             database.insert(postStack);

@@ -8,7 +8,9 @@ import java.util.Properties;
  * Created by dorian on 22/11/14.
  */
 public class Configuration extends Properties {
-    private static Configuration configuration;
+
+	private static final long serialVersionUID = -8023822143720181433L;
+	private static Configuration configuration;
 
     public static Configuration getConfiguration() {
         if (configuration == null) {

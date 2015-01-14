@@ -1,7 +1,7 @@
 package fr.lille1.idl.stackoverflow.persistence;
 
-import de.tud.stacktraces.evaluation.datastruct.*;
-import de.tud.stacktraces.evaluation.datastruct.StackTraceElement;
+import fr.lille1.idl.stackoverflow.parsers.StackTraceElementItf;
+import fr.lille1.idl.stackoverflow.parsers.StackTraceItf;
 import fr.lille1.idl.stackoverflow.processors.SQLProcessor;
 import fr.lille1.idl.stackoverflow.tables.*;
 
@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Created by dorian on 22/11/14.
@@ -307,13 +305,16 @@ public class PostDatabase {
         return postStack;
     }
 
-    public Stack insert(StackTrace stackTrace) throws SQLException {
-        List<StackTraceElement> elements = stackTrace.getElements();
+    public Stack insert(StackTraceItf stackTrace) throws SQLException {
+        List<StackTraceElementItf> elements = stackTrace.getStackTraceElements();
         List<Link> links = new ArrayList<Link>();
         Frame parent = null;
         for (int i = elements.size() - 1; i >= 0; i--) {
-            StackTraceElement element = elements.get(i);
-            Frame child = toFrame(element);
+            StackTraceElementItf element = elements.get(i);
+            String fileName = element.getFileName();
+            String methodName = element.getMethod();
+            int lineNumber = element.getLineNumber();
+            Frame child = new Frame(0, fileName, methodName, lineNumber);
             child = this.insert(child);
             if (parent != null) {
                 Link link = new Link(0, parent, child, null);
@@ -375,18 +376,11 @@ public class PostDatabase {
      * @param element original element
      * @return A Frame
      */
-    private Frame toFrame(final StackTraceElement element) {
-        String[] tokens = element.getSource().split(":");
-        String fileName = tokens[0].trim();
+    private Frame toFrame(final StackTraceElementItf element) {
+        String fileName = element.getFileName();
         String methodName = element.getMethod();
-        int lineNumber = -1;
-        if (tokens.length == 2) {
-            try {
-                lineNumber = Integer.parseInt(tokens[1].trim().replaceAll(" ", ""));
-            } catch (NumberFormatException e) {
-                Logger.getGlobal().log(Level.WARNING, e.getMessage(), e);
-            }
-        }
+        int lineNumber = element.getLineNumber();
+
         Frame frame = new Frame(0, fileName, methodName, lineNumber);
         return frame;
     }
@@ -397,13 +391,13 @@ public class PostDatabase {
      * @param stackTrace Stack trace to look for
      * @return A list of posts containing an identical stack trace
      */
-    public List<Post> find(StackTrace stackTrace) throws SQLException {
+    public List<Post> find(StackTraceItf stackTrace) throws SQLException {
         List<Post> posts = new ArrayList<Post>();
         //Test if the frames exist in the database
-        List<StackTraceElement> elements = stackTrace.getElements();
+        List<StackTraceElementItf> elements = stackTrace.getStackTraceElements();
         List<Frame> frames = new ArrayList<Frame>();
         for (int i = elements.size() - 1; i >= 0; i--) {
-            StackTraceElement element = elements.get(i);
+            StackTraceElementItf element = elements.get(i);
             Frame existingFrame = getExisting(toFrame(element));
             if (existingFrame == null) {
                 return posts;
