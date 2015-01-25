@@ -12,21 +12,41 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.*;
 
 /**
  * Created by dorian on 01/12/14.
  */
 public class Search {
+	
+	private static Logger logger = Logger.getGlobal();
+	
     public static final String USAGE = "Usage : java -jar search-jar-with-dependencies.jar path/to/text.file";
+    
+    public static Set<Post> getSimilarPosts (StackTraceParserItf parser, String stacktrace) throws ClassNotFoundException, SQLException {
+    	Set<Post> similarPosts = new TreeSet<Post>();
+    	List<StackTraceItf> stackTraces = parser.parseAll(stacktrace);
+        if (!stackTraces.isEmpty()) {
+            for (StackTraceItf stackTrace : stackTraces) {
+                logger.info("Stacktrace : " + stackTrace.toString());
+                List<Post> posts = PostDatabase.getInstance().find(stackTrace);
+                similarPosts.addAll(posts);
+            }
+        }
+        
+        return similarPosts;
+    }
 
     public static void main(String[] args) throws IOException, StackTraceParserItf.ParseException, SQLException, ClassNotFoundException {
         if (args.length != 1) {
             System.out.println(USAGE);
             System.exit(0);
         }
-        Logger logger = Logger.getGlobal();
+
         logger.setUseParentHandlers(false);
         SimpleFormatter formatter = new SimpleFormatter();
         FileHandler fh = new FileHandler("search.log", true);
@@ -52,17 +72,12 @@ public class Search {
             }
         }
         String text = new String(Files.readAllBytes(Paths.get(filename)));
-        List<StackTraceItf> stackTraces = (new JavaStackTraceParser()).parseAll(text);
-        if (!stackTraces.isEmpty()) {
-            for (StackTraceItf stackTrace : stackTraces) {
-                System.out.println(stackTrace);
-                List<Post> posts = PostDatabase.getInstance().find(stackTrace);
-                System.out.println("posts : " + posts.size());
-                for (Post post : posts) {
-                    String message = "http://stackoverflow.com/questions/" + post.getId() + "\t" + post.getTitle();
-                    System.out.println(message);
-                    logger.log(Level.INFO, message);
-                }
+       	Set<Post> posts = getSimilarPosts(new JavaStackTraceParser(),text);
+        if ( !posts.isEmpty() ) {
+        	logger.info("posts : " + posts.size());
+            for (Post post : posts) {
+                String message = "http://stackoverflow.com/questions/" + post.getId() + "\t" + post.getTitle();
+                logger.info(message);
             }
         } else {
             logger.log(Level.WARNING, "Did not find any stack trace in input file " + filename);
