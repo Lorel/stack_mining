@@ -22,14 +22,14 @@ import java.util.logging.*;
  * Created by dorian on 01/12/14.
  */
 public class Search {
-	
-	private static Logger logger = Logger.getGlobal();
-	
+
+    private static Logger logger = Logger.getGlobal();
+
     public static final String USAGE = "Usage : java -jar search-jar-with-dependencies.jar path/to/text.file";
-    
-    public static Set<Post> getSimilarPosts (StackTraceParserItf parser, String stacktrace) throws ClassNotFoundException, SQLException {
-    	Set<Post> similarPosts = new TreeSet<Post>();
-    	List<StackTraceItf> stackTraces = parser.parseAll(stacktrace);
+
+    public static Set<Post> getSimilarPosts(StackTraceParserItf parser, String stacktrace) throws ClassNotFoundException, SQLException {
+        Set<Post> similarPosts = new TreeSet<Post>();
+        List<StackTraceItf> stackTraces = parser.parseAll(stacktrace);
         if (!stackTraces.isEmpty()) {
             for (StackTraceItf stackTrace : stackTraces) {
                 logger.info("Stacktrace : " + stackTrace.toString());
@@ -37,7 +37,7 @@ public class Search {
                 similarPosts.addAll(posts);
             }
         }
-        
+
         return similarPosts;
     }
 
@@ -61,7 +61,9 @@ public class Search {
             configuration.load(configFileInputStream);
             configFileInputStream.close();
         } catch (FileNotFoundException e) {
-            logger.log(Level.SEVERE, "Could not find config file config.properties", e);
+            String message = "Could not find config file config.properties";
+            System.err.println(message);
+            logger.log(Level.SEVERE, message, e);
             System.exit(1);
         } catch (IOException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
@@ -72,9 +74,9 @@ public class Search {
             }
         }
         String text = new String(Files.readAllBytes(Paths.get(filename)));
-       	Set<Post> posts = getSimilarPosts(new JavaStackTraceParser(),text);
-        if ( !posts.isEmpty() ) {
-        	logger.info("posts : " + posts.size());
+        Set<Post> posts = getSimilarPosts(new JavaStackTraceParser(), text);
+        if (!posts.isEmpty()) {
+            logger.info("posts : " + posts.size());
             for (Post post : posts) {
                 String message = "http://stackoverflow.com/questions/" + post.getId() + "\t" + post.getTitle();
                 logger.info(message);

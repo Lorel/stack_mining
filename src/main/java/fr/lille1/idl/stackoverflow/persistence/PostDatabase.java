@@ -4,12 +4,10 @@ import fr.lille1.idl.stackoverflow.parsers.StackTraceElementItf;
 import fr.lille1.idl.stackoverflow.parsers.StackTraceItf;
 import fr.lille1.idl.stackoverflow.processors.SQLProcessor;
 import fr.lille1.idl.stackoverflow.tables.*;
+import fr.lille1.idl.stackoverflow.tables.Stack;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by dorian on 22/11/14.
@@ -404,7 +402,6 @@ public class PostDatabase {
             }
             frames.add(existingFrame);
         }
-        //TODO : Use a prepared statement in place of dumb query
         String statement = "SELECT p.id, p.accepted_answer_id FROM post p, post_stack ps, stack s ";
         String from = "";
         String where = "";
@@ -412,14 +409,28 @@ public class PostDatabase {
             String linkName = "l" + i;
             String stackLinkName = "sl" + i;
             from += ", stack_link " + stackLinkName + ", link " + linkName;
-            where += " AND " + stackLinkName + ".stack_id = s.id  AND " + stackLinkName + ".link_id = " + linkName + ".id";
-            where += " AND " + linkName + ".parent_frame_id = " + frames.get(i).getId() + " AND " + linkName + ".child_frame_id = " + frames.get(i + 1).getId();
+            where += " AND \n" + stackLinkName + ".stack_id = s.id  AND " + stackLinkName + ".link_id = " + linkName + ".id";
+            where += " AND " + linkName + ".parent_frame_id = ? AND " + linkName + ".child_frame_id = ?";
         }
         statement += from;
         statement += " WHERE p.id = ps.post_id AND ps.stack_id = s.id ";
         statement += where;
-        Statement query = connection.createStatement();
-        ResultSet set = query.executeQuery(statement);
+        PreparedStatement preparedStatement = connection.prepareStatement(statement);
+        int i = 1;
+        int length = (frames.size() - 1) * 2;
+        Iterator<Frame> it = frames.iterator();
+        Frame first = it.next();
+        Frame second = it.next();
+        while (i <= length && first != null && second != null) {
+            preparedStatement.setInt(i, first.getId());
+            preparedStatement.setInt(i + 1, second.getId());
+            first = second;
+            if (it.hasNext()) {
+                second = it.next();
+            }
+            i += 2;
+        }
+        ResultSet set = preparedStatement.executeQuery();
         while (set.next()) {
             int id = set.getInt(1);
             Post post = find(id);
