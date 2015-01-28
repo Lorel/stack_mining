@@ -418,17 +418,19 @@ public class PostDatabase {
         PreparedStatement preparedStatement = connection.prepareStatement(statement);
         int i = 1;
         int length = (frames.size() - 1) * 2;
-        Iterator<Frame> it = frames.iterator();
-        Frame first = it.next();
-        Frame second = it.next();
-        while (i <= length && first != null && second != null) {
-            preparedStatement.setInt(i, first.getId());
-            preparedStatement.setInt(i + 1, second.getId());
-            first = second;
-            if (it.hasNext()) {
-                second = it.next();
+        if (length > 0) {
+            Iterator<Frame> it = frames.iterator();
+            Frame first = it.next();
+            Frame second = it.next();
+            while (i <= length && first != null && second != null) {
+                preparedStatement.setInt(i, first.getId());
+                preparedStatement.setInt(i + 1, second.getId());
+                first = second;
+                if (it.hasNext()) {
+                    second = it.next();
+                }
+                i += 2;
             }
-            i += 2;
         }
         ResultSet set = preparedStatement.executeQuery();
         while (set.next()) {
