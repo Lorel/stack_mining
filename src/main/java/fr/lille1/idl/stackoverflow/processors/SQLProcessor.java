@@ -28,14 +28,21 @@ public class SQLProcessor implements XMLEventProcessor {
     }
 
     public static Connection getConnection() throws ClassNotFoundException, SQLException {
-        Class.forName("com.mysql.jdbc.Driver");
         Configuration configuration = Configuration.getConfiguration();
         String host = configuration.getProperty("db.host", "127.0.0.1");
         int port = Integer.parseInt(configuration.getProperty("db.port", "3306"));
         String database = configuration.getProperty("db.database", "stackoverflow");
         String user = configuration.getProperty("db.user", "stackoverflow");
         String password = configuration.getProperty("db.password", "stackoverflow");
-        Connection connection = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database +
+	String driver = configuration.getProperty("db.driver", "com.mysql.jdbc.Driver");
+        Class.forName(driver);
+	String protocol = "";
+	if (driver.toLowerCase().contains("mysql")) {
+		protocol = "mysql";
+	} else if (driver.toLowerCase().contains("postgresql")) {
+		protocol = "postgresql";
+	}
+        Connection connection = DriverManager.getConnection("jdbc:" + protocol + "://" + host + ":" + port + "/" + database +
                 "?user=" + user + "&password=" + password);
         return connection;
     }
