@@ -13,12 +13,14 @@ CREATE TABLE stackoverflow.post (
 	title           	VARCHAR(256)		NOT NULL,
 	body            	TEXT			NOT NULL,
 	accepted_answer_id	INTEGER,
-	creation_date		TIMESTAMP		NOT NULL
+	creation_date		TIMESTAMP		NOT NULL,
+	score			INTEGER
 );
 
 CREATE TABLE stackoverflow.stack (
 	id				SERIAL 		PRIMARY KEY,
-	language			VARCHAR(256)	NOT NULL
+	language			VARCHAR(256)	NOT NULL,
+	exception_type			VARCHAR(256)
 );
 
 CREATE TABLE stackoverflow.post_stack (

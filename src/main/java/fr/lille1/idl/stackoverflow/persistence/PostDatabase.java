@@ -224,10 +224,10 @@ public class PostDatabase {
         statement.setInt(2, child.getId());
         if (next == null) {
             statement.setNull(3, Types.INTEGER);
-            statement.setNull(4, Types.INTEGER);
+            //statement.setNull(4, Types.INTEGER);
         } else {
             statement.setInt(3, next.getId());
-            statement.setInt(4, next.getId());
+            //statement.setInt(4, next.getId());
         }
         ResultSet resultSet = statement.executeQuery();
         statement.clearParameters();
