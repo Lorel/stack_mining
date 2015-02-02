@@ -41,8 +41,14 @@ java -jar target/search-jar-with-dependencies /path/to/text.file
 ```
 
 ##Using of the eclipse plugin
+In order to find a solution for a exception return in the eclipse console, the team developed a plugin to search the best answer in the stackoverflow website.
+The video below illustrates the using of the plugin.
+
+[![Example 1](http://img.youtube.com/vi/8B2mHByRCUs/0.jpg)](http://youtu.be/8B2mHByRCUs)
+
 ##Using of the search website
 In order to find an answer on the stackoverflow website without to use the eclipse plugin, we implement a web interface.
 You can send a stacktrace in the website and know the posts where the stacktrace are.
 The video below shows an example.
+
 [![Example 2](http://img.youtube.com/vi/8B2mHByRCUs/0.jpg)](http://youtu.be/8B2mHByRCUs)
