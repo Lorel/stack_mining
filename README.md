@@ -39,3 +39,10 @@ If you don't have one copy the one from *src/main/resources/* at the root of the
 ```bash
 java -jar target/search-jar-with-dependencies /path/to/text.file
 ```
+
+##Using of the eclipse plugin
+##Using of the search website
+In order to find an answer on the stackoverflow website without to use the eclipse plugin, we implement a web interface.
+You can send a stacktrace in the website and know the posts where the stacktrace are.
+The video below shows an example.
+[![Example 2](http://img.youtube.com/vi/8B2mHByRCUs/0.jpg)](http://youtu.be/8B2mHByRCUs)
