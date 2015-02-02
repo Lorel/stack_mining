@@ -25,7 +25,12 @@ public class PythonStackTrace implements StackTraceItf {
 		return elements;
 	}
 
-	@Override
+    @Override
+    public String getExceptionType() {
+        throw new UnsupportedOperationException("not implemented");
+    }
+
+    @Override
 	public int getPosition() {
 		return 0;
 	}

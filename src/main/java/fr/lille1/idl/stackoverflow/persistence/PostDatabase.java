@@ -2,6 +2,8 @@ package fr.lille1.idl.stackoverflow.persistence;
 
 import fr.lille1.idl.stackoverflow.parsers.StackTraceElementItf;
 import fr.lille1.idl.stackoverflow.parsers.StackTraceItf;
+import fr.lille1.idl.stackoverflow.parsers.java.JavaStackTrace;
+import fr.lille1.idl.stackoverflow.parsers.python.PythonStackTrace;
 import fr.lille1.idl.stackoverflow.processors.SQLProcessor;
 import fr.lille1.idl.stackoverflow.tables.*;
 import fr.lille1.idl.stackoverflow.tables.Stack;
@@ -36,6 +38,7 @@ public class PostDatabase {
     private static String BODY = "body";
     private static String ACCEPTED_ANSWER = "accepted_answer_id";
     private static String DATE = "creation_date";
+    private static String SCORE = "score";
 
     // LINKS
     private static String PARENT_FRAME = "parent_frame_id";
@@ -54,7 +57,7 @@ public class PostDatabase {
         this.connection = connection;
         this.statements = new HashMap<OPERATIONS, PreparedStatement>();
         
-        String insertStatement = "INSERT INTO post(" + ID + ", " + TITLE + ", " + BODY + ", " + ACCEPTED_ANSWER + ", " + DATE + ") VALUES(?, ?, ?, ?, ?)";
+        String insertStatement = "INSERT INTO post(" + ID + ", " + TITLE + ", " + BODY + ", " + ACCEPTED_ANSWER + ", " + DATE + ", " + SCORE + ") VALUES(?, ?, ?, ?, ?, ?)";
         PreparedStatement insertPreparedStatement = this.connection.prepareStatement(insertStatement);
         this.statements.put(OPERATIONS.INSERT, insertPreparedStatement);
         
@@ -74,7 +77,7 @@ public class PostDatabase {
         PreparedStatement insertLink = connection.prepareStatement(insertLinkStatement, Statement.RETURN_GENERATED_KEYS);
         this.statements.put(OPERATIONS.INSERT_LINK, insertLink);
         
-        String insertStackStatement = "INSERT INTO stack(language) VALUES(?);";
+        String insertStackStatement = "INSERT INTO stack(language, exception_type) VALUES(?, ?);";
         PreparedStatement insertStack = connection.prepareStatement(insertStackStatement, Statement.RETURN_GENERATED_KEYS);
         this.statements.put(OPERATIONS.INSERT_STACK, insertStack);
         
@@ -116,6 +119,7 @@ public class PostDatabase {
         statement.setString(3, post.getBody());
         statement.setInt(4, post.getAcceptedAnswerId());
         statement.setTimestamp(5, post.getCreationDate());
+        statement.setInt(6, post.getScore());
         statement.executeUpdate();
     }
 
@@ -139,6 +143,7 @@ public class PostDatabase {
         String title = resultSet.getString(TITLE);
         String body = resultSet.getString(BODY);
         Timestamp creationDate = resultSet.getTimestamp(DATE);
+        int score = resultSet.getInt(SCORE);
         resultSet.close();
         Post post = new Post();
         post.setId(id);
@@ -146,6 +151,7 @@ public class PostDatabase {
         post.setBody(body);
         post.setAcceptedAnswerId(Integer.valueOf(acceptedAnswer));
         post.setCreationDate(creationDate);
+        post.setScore(score);
         return post;
     }
 
@@ -267,6 +273,7 @@ public class PostDatabase {
     public Stack insert(Stack stack) throws SQLException {
         PreparedStatement statement = statements.get(OPERATIONS.INSERT_STACK);
         statement.setString(1, stack.getLanguage());
+        statement.setString(2, stack.getExceptionType());
         statement.executeUpdate();
         ResultSet resultSet = statement.getGeneratedKeys();
         resultSet.next();
@@ -320,7 +327,13 @@ public class PostDatabase {
             }
             parent = child;
         }
-        Stack stack = new Stack(0, "java");
+        String language = "unknown";
+        if (stackTrace instanceof JavaStackTrace) {
+            language = "java";
+        } else if (stackTrace instanceof PythonStackTrace) {
+            language = "python";
+        }
+        Stack stack = new Stack(0, language, stackTrace.getExceptionType().trim());
         stack = this.insert(stack);
         Link parentLink = null;
         for (Link link : links) {

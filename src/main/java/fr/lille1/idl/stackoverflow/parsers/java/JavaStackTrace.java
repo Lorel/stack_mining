@@ -30,7 +30,12 @@ public class JavaStackTrace implements StackTraceItf {
 		return elements;
 	}
 
-	@Override
+    @Override
+    public String getExceptionType() {
+        return stackTrace.getExceptionType();
+    }
+
+    @Override
 	public int getPosition() {
 		if (this.parent == null)
 			return 0;

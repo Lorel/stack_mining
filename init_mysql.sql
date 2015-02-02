@@ -5,7 +5,8 @@ CREATE TABLE IF NOT EXISTS stackoverflow.post (
 	title           	VARCHAR(256)		NOT NULL,
 	body            	TEXT			NOT NULL,
 	accepted_answer_id	INTEGER,
-	creation_date		TIMESTAMP		NOT NULL
+	creation_date		TIMESTAMP		NOT NULL,
+	score			INTEGER
 );
 
 CREATE TABLE IF NOT EXISTS stackoverflow.post_answer (
@@ -17,6 +18,7 @@ CREATE TABLE IF NOT EXISTS stackoverflow.post_answer (
 
 CREATE TABLE IF NOT EXISTS stackoverflow.stack (
 	id				INTEGER			AUTO_INCREMENT PRIMARY KEY,
+	exception_type			VARCHAR(256)	NOT NULL,
 	language			VARCHAR(256)	NOT NULL
 );
 

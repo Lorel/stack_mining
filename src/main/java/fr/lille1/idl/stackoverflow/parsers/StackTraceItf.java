@@ -5,6 +5,8 @@ import java.util.List;
 public interface StackTraceItf {
 
 	public List<StackTraceElementItf> getStackTraceElements();
+
+    public String getExceptionType();
 	
 	public int getPosition();
 	

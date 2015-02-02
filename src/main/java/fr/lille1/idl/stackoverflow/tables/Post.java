@@ -22,19 +22,29 @@ import java.util.Date;
  */
 public class Post implements Serializable {
 
-	private static final long serialVersionUID = -9076424213715351234L;
+    private static final long serialVersionUID = -9076424213715351234L;
 
-	private int id;
+    private int id;
 
     private String title;
 
     private String body;
 
     private Post acceptedAnswer;
-    
+
     private Integer acceptedAnswerId;
 
     private Timestamp creationDate;
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
+
+    private int score;
 
     public Post(final XMLEvent event) {
         StartElement start = event.asStartElement();
@@ -68,6 +78,16 @@ public class Post implements Serializable {
             creationDate = new Timestamp((new Date()).getTime());
         }
         this.creationDate = creationDate;
+
+        Attribute scoreAttribute = start.getAttributeByName(new QName("Score"));
+        int score;
+        try {
+            score = Integer.parseInt(scoreAttribute.getValue());
+        } catch (NumberFormatException e) {
+            score = 0;
+        }
+        this.score = 0;
+
     }
 
     public Post() {
@@ -106,9 +126,9 @@ public class Post implements Serializable {
         this.body = body;
     }
 
-    public Post getAcceptedAnswer() throws ClassNotFoundException, SQLException {    	
-    	if (this.acceptedAnswer == null && this.acceptedAnswerId != null)
-    		this.acceptedAnswer = PostDatabase.getInstance().find(this.acceptedAnswerId.intValue());
+    public Post getAcceptedAnswer() throws ClassNotFoundException, SQLException {
+        if (this.acceptedAnswer == null && this.acceptedAnswerId != null)
+            this.acceptedAnswer = PostDatabase.getInstance().find(this.acceptedAnswerId.intValue());
         return acceptedAnswer;
     }
 
@@ -116,13 +136,13 @@ public class Post implements Serializable {
         this.acceptedAnswer = acceptedAnswer;
     }
 
-	public Integer getAcceptedAnswerId() {
-		if (this.acceptedAnswer != null && this.acceptedAnswerId == null)
-			this.acceptedAnswerId = this.acceptedAnswer.getId();
-		return acceptedAnswerId;
-	}
+    public Integer getAcceptedAnswerId() {
+        if (this.acceptedAnswer != null && this.acceptedAnswerId == null)
+            this.acceptedAnswerId = this.acceptedAnswer.getId();
+        return acceptedAnswerId;
+    }
 
-	public void setAcceptedAnswerId(Integer acceptedAnswerId) {
-		this.acceptedAnswerId = acceptedAnswerId;
-	}
+    public void setAcceptedAnswerId(Integer acceptedAnswerId) {
+        this.acceptedAnswerId = acceptedAnswerId;
+    }
 }

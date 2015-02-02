@@ -10,10 +10,21 @@ public class Stack implements Serializable {
 	
 	private String language;
 
-	public Stack(int id, String language) {
+    public String getExceptionType() {
+        return exceptionType;
+    }
+
+    public void setExceptionType(String exceptionType) {
+        this.exceptionType = exceptionType;
+    }
+
+    private String exceptionType;
+
+	public Stack(int id, String language, String exceptionType) {
 		super();
 		this.id = id;
 		this.language = language;
+        this.exceptionType = exceptionType;
 	}
 
 	public int getId() {

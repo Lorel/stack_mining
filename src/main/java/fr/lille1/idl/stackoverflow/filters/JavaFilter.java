@@ -32,8 +32,8 @@ public class JavaFilter implements XMLEventFilter {
         if (acceptedAnswer == null) {
             return false;
         }
-        Attribute parentId = start.getAttributeByName(new QName("parentId"));
-        if (parentId == null) {
+        Attribute parentId = start.getAttributeByName(new QName("ParentId"));
+        if (parentId != null) {
             return false;
         }
         Attribute tagsAttribute = start.getAttributeByName(new QName("Tags"));
